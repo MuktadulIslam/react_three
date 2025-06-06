@@ -1,19 +1,17 @@
 'use client'
-import React, { useRef, useState, useCallback } from 'react';
-import { Canvas, useFrame, useThree, extend } from '@react-three/fiber';
+import React, { useRef, useState, useEffect, JSX } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
+import { DragControls } from 'three/addons/controls/DragControls.js';
 
 // Types
-interface Position {
-  x: number;
-  y: number;
-  z: number;
-}
-
-interface DraggableObject {
-  object: THREE.Object3D;
+interface DraggableMeshProps {
+  position: [number, number, number];
+  color: number;
+  geometry: JSX.Element;
   name: string;
+  scale?: [number, number, number];
 }
 
 // Floor Component
@@ -32,211 +30,119 @@ const Floor: React.FC = () => {
   );
 };
 
-// Draggable Box Component
-const DraggableBox: React.FC<{ onDrag: (object: THREE.Object3D) => void }> = ({ onDrag }) => {
+// Generic Draggable Mesh Component
+const DraggableMesh: React.FC<DraggableMeshProps> = ({ 
+  position, 
+  color, 
+  geometry, 
+  name,
+  scale = [1, 1, 1]
+}) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  
-  const handleClick = useCallback((event: any) => {
-    event.stopPropagation();
-    if (meshRef.current) {
-      onDrag(meshRef.current);
-    }
-  }, [onDrag]);
 
   return (
     <mesh
       ref={meshRef}
-      position={[15, 3, 15]}
-      scale={[6, 6, 6]}
+      position={position}
+      scale={scale}
       castShadow
       receiveShadow
-      onClick={handleClick}
-      userData={{ draggable: true, name: 'BOX' }}
+      userData={{ draggable: true, name }}
     >
-      <boxGeometry />
-      <meshPhongMaterial color={0xDC143C} />
+      {geometry}
+      <meshPhongMaterial color={color} />
     </mesh>
   );
 };
 
-// Draggable Sphere Component
-const DraggableSphere: React.FC<{ onDrag: (object: THREE.Object3D) => void }> = ({ onDrag }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
-  const handleClick = useCallback((event: any) => {
-    event.stopPropagation();
-    if (meshRef.current) {
-      onDrag(meshRef.current);
-    }
-  }, [onDrag]);
+// DragControlsHandler
+const DragControlsHandler: React.FC = () => {
+  const { camera, gl, scene } = useThree();
+  const [draggableObjects, setDraggableObjects] = useState<THREE.Object3D[]>([]);
+  const [dragControls, setDragControls] = useState<any>(null);
+  const orbitControlsRef = useRef<any>(null);
 
-  return (
-    <mesh
-      ref={meshRef}
-      position={[15, 4, -15]}
-      castShadow
-      receiveShadow
-      onClick={handleClick}
-      userData={{ draggable: true, name: 'SPHERE' }}
-    >
-      <sphereGeometry args={[4, 32, 32]} />
-      <meshPhongMaterial color={0x43a1f4} />
-    </mesh>
-  );
-};
-
-// Draggable Cylinder Component
-const DraggableCylinder: React.FC<{ onDrag: (object: THREE.Object3D) => void }> = ({ onDrag }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
-  const handleClick = useCallback((event: any) => {
-    event.stopPropagation();
-    if (meshRef.current) {
-      onDrag(meshRef.current);
-    }
-  }, [onDrag]);
-
-  return (
-    <mesh
-      ref={meshRef}
-      position={[-15, 3, 15]}
-      castShadow
-      receiveShadow
-      onClick={handleClick}
-      userData={{ draggable: true, name: 'CYLINDER' }}
-    >
-      <cylinderGeometry args={[4, 4, 6, 32]} />
-      <meshPhongMaterial color={0x90ee90} />
-    </mesh>
-  );
-};
-
-// Simple Castle Component (using a scaled box as placeholder since we can't load OBJ files)
-const DraggableCastle: React.FC<{ onDrag: (object: THREE.Object3D) => void }> = ({ onDrag }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
-  const handleClick = useCallback((event: any) => {
-    event.stopPropagation();
-    if (meshRef.current) {
-      onDrag(meshRef.current);
-    }
-  }, [onDrag]);
-
-  return (
-    <group 
-      ref={meshRef}
-      position={[-15, 0, -15]} 
-      scale={[5, 5, 5]}
-      userData={{ draggable: true, name: 'CASTLE' }}
-      onClick={handleClick}
-    >
-      {/* Main castle body */}
-      <mesh position={[0, 1, 0]} castShadow receiveShadow>
-        <boxGeometry args={[2, 2, 2]} />
-        <meshPhongMaterial color={0x8B4513} />
-      </mesh>
-      {/* Castle towers */}
-      <mesh position={[-0.8, 1.8, -0.8]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.3, 0.3, 1.6, 8]} />
-        <meshPhongMaterial color={0x696969} />
-      </mesh>
-      <mesh position={[0.8, 1.8, -0.8]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.3, 0.3, 1.6, 8]} />
-        <meshPhongMaterial color={0x696969} />
-      </mesh>
-      <mesh position={[-0.8, 1.8, 0.8]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.3, 0.3, 1.6, 8]} />
-        <meshPhongMaterial color={0x696969} />
-      </mesh>
-      <mesh position={[0.8, 1.8, 0.8]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.3, 0.3, 1.6, 8]} />
-        <meshPhongMaterial color={0x696969} />
-      </mesh>
-    </group>
-  );
-};
-
-// Drag Handler Hook
-const DragHandler: React.FC<{ 
-  draggableObject: DraggableObject | null, 
-  setDraggableObject: (obj: DraggableObject | null) => void,
-  setOrbitEnabled: (enabled: boolean) => void
-}> = ({ draggableObject, setDraggableObject, setOrbitEnabled }) => {
-  const { camera, raycaster, scene } = useThree();
-  const [mousePosition, setMousePosition] = useState<THREE.Vector2>(new THREE.Vector2());
-  const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
-
-  useFrame(() => {
-    if (draggableObject && isMouseDown) {
-      raycaster.setFromCamera(mousePosition, camera);
-      const intersects = raycaster.intersectObjects(scene.children, true);
+  // Find all draggable objects
+  useEffect(() => {
+    const findDraggableObjects = () => {
+      const objects: THREE.Object3D[] = [];
       
-      for (const intersect of intersects) {
-        if (intersect.object.userData?.ground) {
-          const target = intersect.point;
-          draggableObject.object.position.x = target.x;
-          draggableObject.object.position.z = target.z;
-          break;
+      scene.traverse((object) => {
+        if (object.userData && object.userData.draggable) {
+          objects.push(object);
         }
-      }
-    }
-  });
-
-  const handleMouseMove = useCallback((event: MouseEvent) => {
-    const x = (event.clientX / window.innerWidth) * 2 - 1;
-    const y = -(event.clientY / window.innerHeight) * 2 + 1;
-    setMousePosition(new THREE.Vector2(x, y));
-  }, []);
-
-  const handleMouseDown = useCallback((event: MouseEvent) => {
-    if (event.button === 0) { // Left mouse button
-      setIsMouseDown(true);
-      if (draggableObject) {
-        setOrbitEnabled(false);
-        console.log(`dragging ${draggableObject.name}`);
-      }
-    }
-  }, [draggableObject, setOrbitEnabled]);
-
-  const handleMouseUp = useCallback((event: MouseEvent) => {
-    if (event.button === 0) { // Left mouse button
-      setIsMouseDown(false);
-      if (draggableObject) {
-        console.log(`dropping draggable ${draggableObject.name}`);
-        setDraggableObject(null);
-        setOrbitEnabled(true);
-      }
-    }
-  }, [draggableObject, setDraggableObject, setOrbitEnabled]);
-
-  React.useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
-    
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
+      });
+      
+      setDraggableObjects(objects);
     };
-  }, [handleMouseMove, handleMouseDown, handleMouseUp]);
+    
+    // Wait a bit for all objects to be added to the scene
+    const timeoutId = setTimeout(findDraggableObjects, 100);
+    return () => clearTimeout(timeoutId);
+  }, [scene]);
 
-  return null;
+  // Initialize DragControls
+  useEffect(() => {
+    if (draggableObjects.length > 0 && !dragControls) {
+      // Create drag controls using the imported DragControls class
+      const controls = new DragControls(draggableObjects, camera, gl.domElement);
+      
+      // Add event listeners
+      controls.addEventListener('dragstart', () => {
+        // Disable orbit controls while dragging
+        if (orbitControlsRef.current) {
+          orbitControlsRef.current.enabled = false;
+        }
+      });
+      
+      controls.addEventListener('dragend', () => {
+        // Re-enable orbit controls after dragging
+        if (orbitControlsRef.current) {
+          orbitControlsRef.current.enabled = true;
+        }
+      });
+      
+      controls.addEventListener('drag', (event: any) => {
+        // Lock Y position to prevent floating objects
+        event.object.position.y = event.object.userData.originalY || 3;
+        
+        // Constrain objects within floor boundaries
+        // Floor is at position [0, -1, 3] with scale [100, 2, 100]
+        // This creates a floor from -50 to 50 in X and -47 to 53 in Z
+        const floorBoundaryX = 45; // Leave some margin from edge
+        const floorBoundaryZ = 45; // Leave some margin from edge
+        const floorCenterZ = 3; // Floor center Z position
+        
+        // Clamp X position
+        event.object.position.x = Math.max(-floorBoundaryX, 
+          Math.min(floorBoundaryX, event.object.position.x));
+        
+        // Clamp Z position around floor center
+        event.object.position.z = Math.max(floorCenterZ - floorBoundaryZ, 
+          Math.min(floorCenterZ + floorBoundaryZ, event.object.position.z));
+      });
+      
+      // Save original Y positions
+      draggableObjects.forEach(obj => {
+        obj.userData.originalY = obj.position.y;
+      });
+      
+      setDragControls(controls);
+    }
+  }, [draggableObjects, camera, gl.domElement, dragControls]);
+
+  return (
+    <OrbitControls 
+      ref={orbitControlsRef}
+      enablePan={true} 
+      enableRotate={true} 
+      enableZoom={true} 
+    />
+  );
 };
 
 // Main Scene Component
 const Scene: React.FC = () => {
-  const [draggableObject, setDraggableObject] = useState<DraggableObject | null>(null);
-  const [orbitEnabled, setOrbitEnabled] = useState<boolean>(true);
-
-  const handleObjectDrag = useCallback((object: THREE.Object3D) => {
-    if (!draggableObject) {
-      const name = object.userData.name || 'UNKNOWN';
-      console.log(`found draggable ${name}`);
-      setDraggableObject({ object, name });
-    }
-  }, [draggableObject]);
-
   return (
     <>
       {/* Lighting */}
@@ -253,26 +159,34 @@ const Scene: React.FC = () => {
         shadow-camera-bottom={-70}
       />
 
-      {/* Objects */}
+      {/* Floor */}
       <Floor />
-      <DraggableBox onDrag={handleObjectDrag} />
-      <DraggableSphere onDrag={handleObjectDrag} />
-      <DraggableCylinder onDrag={handleObjectDrag} />
-      <DraggableCastle onDrag={handleObjectDrag} />
-
-      {/* Controls */}
-      <OrbitControls 
-        enablePan={true} 
-        enableRotate={orbitEnabled} 
-        enableZoom={true} 
+      
+      {/* Draggable Objects */}
+      <DraggableMesh 
+        position={[15, 3, 15]} 
+        color={0xDC143C} 
+        scale={[6, 6, 6]}
+        geometry={<boxGeometry />} 
+        name="BOX" 
       />
       
-      {/* Drag Handler */}
-      <DragHandler 
-        draggableObject={draggableObject} 
-        setDraggableObject={setDraggableObject}
-        setOrbitEnabled={setOrbitEnabled}
+      <DraggableMesh 
+        position={[15, 4, -15]} 
+        color={0x43a1f4} 
+        geometry={<sphereGeometry args={[4, 32, 32]} />} 
+        name="SPHERE" 
       />
+      
+      <DraggableMesh 
+        position={[-15, 3, 15]} 
+        color={0x90ee90} 
+        geometry={<cylinderGeometry args={[4, 4, 6, 32]} />} 
+        name="CYLINDER" 
+      />
+
+      {/* Controls */}
+      <DragControlsHandler />
     </>
   );
 };
@@ -280,7 +194,7 @@ const Scene: React.FC = () => {
 // Main App Component
 const App: React.FC = () => {
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div className="w-screen h-screen">
       <Canvas
         camera={{ 
           position: [-35, 70, 100], 
@@ -295,23 +209,12 @@ const App: React.FC = () => {
       </Canvas>
       
       {/* Instructions */}
-      <div style={{
-        position: 'absolute',
-        top: 20,
-        left: 20,
-        color: 'white',
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        padding: '15px',
-        borderRadius: '8px',
-        fontFamily: 'Arial, sans-serif',
-        fontSize: '14px'
-      }}>
-        <h3 style={{ margin: '0 0 10px 0' }}>Interactive 3D Scene</h3>
-        <p style={{ margin: '5px 0' }}>• Click objects to select them</p>
-        <p style={{ margin: '5px 0' }}>• Hold LEFT mouse button and move to drag</p>
-        <p style={{ margin: '5px 0' }}>• Release mouse button to drop</p>
-        <p style={{ margin: '5px 0' }}>• Camera rotation disabled while dragging</p>
-        <p style={{ margin: '5px 0' }}>• Use mouse to orbit camera when not dragging</p>
+      <div className="absolute top-5 left-5 text-white bg-black bg-opacity-70 p-4 rounded-lg font-sans text-sm">
+        <h3 className="m-0 mb-2 text-base font-semibold">Interactive 3D Scene</h3>
+        <p className="my-1">• Click and drag objects to move them</p>
+        <p className="my-1">• Objects are constrained within the floor boundaries</p>
+        <p className="my-1">• Camera controls automatically disable while dragging</p>
+        <p className="my-1">• Use mouse to orbit camera when not dragging</p>
       </div>
     </div>
   );
