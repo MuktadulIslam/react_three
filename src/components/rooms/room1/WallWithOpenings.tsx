@@ -9,30 +9,30 @@ const getWallSpecs = ({ roomLength, roomWidth, roomHeight, wall }: { roomLength:
   switch (wall) {
     case 'front':
       return {
-        position: { x: 0, y: roomHeight / 2, z: roomLength / 2 },
+        position: { x: 0, y: roomHeight / 2, z: roomWidth / 2 }, // swapped roomLength -> roomWidth
         rotation: [0, 0, 0] as [number, number, number],
-        wallLength: roomWidth,
+        wallLength: roomLength, // swapped roomWidth -> roomLength
         normal: { x: 0, y: 0, z: 1 }
       };
     case 'back':
       return {
-        position: { x: 0, y: roomHeight / 2, z: -roomLength / 2 },
+        position: { x: 0, y: roomHeight / 2, z: -roomWidth / 2 }, // swapped roomLength -> roomWidth
         rotation: [0, 0, 0] as [number, number, number],
-        wallLength: roomWidth,
+        wallLength: roomLength, // swapped roomWidth -> roomLength
         normal: { x: 0, y: 0, z: 1 }
       };
     case 'left':
       return {
-        position: { x: -roomWidth / 2, y: roomHeight / 2, z: 0 },
+        position: { x: -roomLength / 2, y: roomHeight / 2, z: 0 }, // swapped roomWidth -> roomLength
         rotation: [0, Math.PI / 2, 0] as [number, number, number],
-        wallLength: roomLength,
+        wallLength: roomWidth, // swapped roomLength -> roomWidth
         normal: { x: 1, y: 0, z: 0 }
       };
     case 'right':
       return {
-        position: { x: roomWidth / 2, y: roomHeight / 2, z: 0 },
+        position: { x: roomLength / 2, y: roomHeight / 2, z: 0 }, // swapped roomWidth -> roomLength
         rotation: [0, -Math.PI / 2, 0] as [number, number, number],
-        wallLength: roomLength,
+        wallLength: roomWidth, // swapped roomLength -> roomWidth
         normal: { x: -1, y: 0, z: 0 }
       };
     default:
@@ -109,8 +109,7 @@ export default function WallWithOpenings({
     .filter(decoration => isWithinWallBounds(decoration, wallSpec.wallLength, roomHeight));
 
   return (
-    <group
-    >
+    <group>
       {/* Full wall plane - always create the complete wall first */}
       <Plane
         key={`${wall}-full-wall`}
@@ -152,4 +151,4 @@ export default function WallWithOpenings({
       ))}
     </group>
   );
-};
+}

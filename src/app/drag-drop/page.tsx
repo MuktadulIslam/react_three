@@ -4,47 +4,20 @@ import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, DragControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-// Define object types
-type ObjectType = 'box' | 'car' | 'table' | 'chair' | 'custom'
 type PlacedObject = {
   id: string
-  type: ObjectType
+  component: React.ReactNode
   position: [number, number, number]
-  color: string
 }
 
 // Sidebar component
 const Sidebar: React.FC<{
-  onDragStart: (objectType: ObjectType, color: string) => void
+  onDragStart: (component: React.ReactNode, dragData: string) => void
 }> = ({ onDragStart }) => {
-  const [activeColor, setActiveColor] = useState<string>('#4f46e5')
-  
-  const colors = [
-    '#4f46e5', // indigo
-    '#ef4444', // red
-    '#22c55e', // green
-    '#eab308', // yellow
-    '#06b6d4', // cyan
-    '#ec4899'  // pink
-  ]
   
   return (
     <div className="absolute left-0 top-0 h-full w-64 bg-gray-900/80 backdrop-blur-sm text-white p-4 flex flex-col z-10 rounded-r-lg shadow-xl border-r border-gray-700">
       <h2 className="text-xl font-bold mb-6 text-center">3D Objects</h2>
-      
-      <div className="mb-6">
-        <h3 className="text-sm uppercase tracking-wider mb-2 opacity-70">Color</h3>
-        <div className="flex flex-wrap gap-2">
-          {colors.map(color => (
-            <button
-              key={color}
-              className={`w-8 h-8 rounded-full transition-all ${activeColor === color ? 'ring-2 ring-white scale-110' : 'opacity-80 hover:opacity-100'}`}
-              style={{ backgroundColor: color }}
-              onClick={() => setActiveColor(color)}
-            />
-          ))}
-        </div>
-      </div>
       
       <h3 className="text-sm uppercase tracking-wider mb-3 opacity-70">Objects</h3>
       <div className="flex flex-col gap-3">
@@ -53,7 +26,7 @@ const Sidebar: React.FC<{
           draggable
           onDragStart={(e) => {
             e.dataTransfer.setData('text/plain', 'box')
-            onDragStart('box', activeColor)
+            onDragStart(<BoxObject />, 'box')
           }}
         >
           <div className="w-5 h-5 mr-3 bg-white/80 rounded-sm"></div>
@@ -65,7 +38,7 @@ const Sidebar: React.FC<{
           draggable
           onDragStart={(e) => {
             e.dataTransfer.setData('text/plain', 'car')
-            onDragStart('car', activeColor)
+            onDragStart(<Car />, 'car')
           }}
         >
           <div className="w-6 h-4 mr-3 bg-white/80 rounded-sm"></div>
@@ -77,7 +50,7 @@ const Sidebar: React.FC<{
           draggable
           onDragStart={(e) => {
             e.dataTransfer.setData('text/plain', 'table')
-            onDragStart('table', activeColor)
+            onDragStart(<Table />, 'table')
           }}
         >
           <div className="w-5 h-3 mr-3 bg-white/80 rounded-sm"></div>
@@ -89,7 +62,7 @@ const Sidebar: React.FC<{
           draggable
           onDragStart={(e) => {
             e.dataTransfer.setData('text/plain', 'chair')
-            onDragStart('chair', activeColor)
+            onDragStart(<Chair />, 'chair')
           }}
         >
           <div className="w-4 h-5 mr-3 bg-white/80 rounded-sm"></div>
@@ -101,7 +74,7 @@ const Sidebar: React.FC<{
           draggable
           onDragStart={(e) => {
             e.dataTransfer.setData('text/plain', 'custom')
-            onDragStart('custom', activeColor)
+            onDragStart(<CustomObject />, 'custom')
           }}
         >
           <div className="w-4 h-4 mr-3 bg-white/80 rounded-full"></div>
@@ -322,32 +295,14 @@ function BoxObject({ color = 'green', isHovered = false }: { color?: string, isH
   )
 }
 
-// Create object based on type
-function createObject(type: ObjectType, color: string, id: string) {
-  const props = { color }
-  
-  switch (type) {
-    case 'box':
-      return <BoxObject key={id} {...props} />
-    case 'car':
-      return <Car key={id} {...props} />
-    case 'table':
-      return <Table key={id} {...props} />
-    case 'chair':
-      return <Chair key={id} {...props} />
-    case 'custom':
-      return <CustomObject key={id} {...props} />
-    default:
-      return <BoxObject key={id} {...props} />
-  }
-}
+
 
 // Scene component with drop functionality
 const Scene: React.FC<{
   objects: PlacedObject[],
   setObjects: React.Dispatch<React.SetStateAction<PlacedObject[]>>,
-  currentObject: { type: ObjectType, color: string } | null,
-  setCurrentObject: React.Dispatch<React.SetStateAction<{ type: ObjectType, color: string } | null>>,
+  currentObject: { component: React.ReactNode } | null,
+  setCurrentObject: React.Dispatch<React.SetStateAction<{ component: React.ReactNode } | null>>,
   setOrbitEnabled: (enabled: boolean) => void
 }> = ({ objects, setObjects, currentObject, setCurrentObject, setOrbitEnabled }) => {
   const { camera, raycaster, scene, gl } = useThree()
@@ -379,9 +334,8 @@ const Scene: React.FC<{
             
             const newObject: PlacedObject = {
               id: Date.now().toString(),
-              type: currentObject.type,
-              position: [point.x, 1, point.z],
-              color: currentObject.color
+              component: currentObject.component,
+              position: [point.x, 1, point.z]
             }
             
             setObjects(prev => [...prev, newObject])
@@ -433,7 +387,7 @@ const Scene: React.FC<{
           groundSize={groundSize}
           setOrbitEnabled={setOrbitEnabled}
         >
-          {createObject(obj.type, obj.color, obj.id)}
+          {React.cloneElement(obj.component as React.ReactElement, { key: obj.id })}
         </DraggableObject>
       ))}
 
@@ -451,11 +405,11 @@ const Scene: React.FC<{
 
 export default function App(): JSX.Element {
   const [objects, setObjects] = useState<PlacedObject[]>([])
-  const [currentObject, setCurrentObject] = useState<{ type: ObjectType, color: string } | null>(null)
+  const [currentObject, setCurrentObject] = useState<{ component: React.ReactNode } | null>(null)
   const [orbitEnabled, setOrbitEnabled] = useState(true)
   
-  const handleDragStart = (objectType: ObjectType, color: string) => {
-    setCurrentObject({ type: objectType, color })
+  const handleDragStart = (component: React.ReactNode, dragData: string) => {
+    setCurrentObject({ component })
   }
 
   return (
@@ -463,7 +417,7 @@ export default function App(): JSX.Element {
       <Sidebar onDragStart={handleDragStart} />
       
       <div style={{ width: '100vw', height: '100vh' }}>
-        <Canvas camera={{ position: [0, 12, 12], fov: 75 }} >
+        <Canvas camera={{ position: [0, 12, 12], fov: 75 }}>
           <Scene 
             objects={objects}
             setObjects={setObjects}
@@ -471,9 +425,11 @@ export default function App(): JSX.Element {
             setCurrentObject={setCurrentObject}
             setOrbitEnabled={setOrbitEnabled}
           />
-          <OrbitControls enabled={orbitEnabled}/>
+          <OrbitControls enabled={orbitEnabled} />
         </Canvas>
       </div>
+      
+
     </div>
   )
 }

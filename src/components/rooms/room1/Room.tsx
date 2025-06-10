@@ -5,8 +5,8 @@ import WallWithOpenings from './WallWithOpenings';
 import { getRoomConfig } from './roomConfig';
 
 interface RoomProps {
-  width: number;
-  length: number;
+  length: number;     // length of x-axis 
+  width: number;      // length of z-axis 
 }
 export default function Room({ width, length }: RoomProps) {
 
@@ -18,7 +18,7 @@ export default function Room({ width, length }: RoomProps) {
       {/* Tiled floor */}
       <TiledFloor
         width={roomWidth}
-        height={roomLength}
+        length={roomLength}
         color={colors.floor}
         alternateColor={colors?.alternateFloor}
       />
@@ -27,7 +27,7 @@ export default function Room({ width, length }: RoomProps) {
       <Plane
         rotation={[Math.PI / 2, 0, 0]}
         position={[0, roomHeight, 0]}
-        args={[roomWidth, roomLength]}
+        args={[roomLength, roomWidth]}
       >
         <meshStandardMaterial color={colors.ceiling} />
       </Plane>

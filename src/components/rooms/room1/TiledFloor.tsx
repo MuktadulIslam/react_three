@@ -18,14 +18,14 @@ function FloorTile({ position, isAlternate, color, alternateColor }: FloorTilePr
 }
 
 // Tiled floor component
-export default function TiledFloor({ width, height, color, alternateColor }: TiledFloorProps) {
+export default function TiledFloor({ width, length, color, alternateColor }: TiledFloorProps) {
   const tiles: React.JSX.Element[] = [];
   const safeAlternateColor = alternateColor ?? "#cccccc";
 
-  for (let x = 0; x < width; x++) {
-    for (let z = 0; z < height; z++) {
-      const posX = x - width / 2 + 0.5;
-      const posZ = z - height / 2 + 0.5;
+  for (let x = 0; x < length; x++) {
+    for (let z = 0; z < width; z++) {
+      const posX = x - length / 2 + 0.5;
+      const posZ = z - width / 2 + 0.5;
       const isAlternate = (x + z) % 2 === 1;
 
       tiles.push(
@@ -40,5 +40,5 @@ export default function TiledFloor({ width, height, color, alternateColor }: Til
     }
   }
 
-  return <group>{tiles}</group>;
+  return <group position={[0,0,0]}>{tiles}</group>;
 };

@@ -104,7 +104,7 @@ export interface WallWithOpeningsProps {
 
 export interface TiledFloorProps {
     width: number;
-    height: number;
+    length: number;
     color: string;
     alternateColor?: string;
 }

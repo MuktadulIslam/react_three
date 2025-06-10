@@ -3,8 +3,8 @@ import { RoomConfig } from "./types"
 export function getRoomConfig(width: number, length: number): RoomConfig {
     return {
         dimensions: {
+            length: length || 15,
             width: width || 10,
-            length: length || 10,
             height: 5
         },
         colors: {
