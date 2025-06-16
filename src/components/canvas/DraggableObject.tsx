@@ -2,6 +2,7 @@ import { DragControls } from "@react-three/drei"
 import React from "react"
 import { useEffect, useRef, useState } from "react"
 import * as THREE from 'three'
+import { useMeshContext } from "./MeshContext"
 
 interface DraggableObjectProps {
   position: [number, number, number],
@@ -17,6 +18,7 @@ export default function DraggableObject({
   children
 }: DraggableObjectProps) {
 
+   const { setObject } = useMeshContext();
   const [isHovered, setIsHovered] = useState(false)
   const [objectSize, setObjectSize] = useState<[number, number, number]>([1, 1, 1])
   const [objectPosition, setObjectPosition] = useState<[number, number, number]>([position[0], 0, position[2]]) // for now everything should be on ground
@@ -36,10 +38,11 @@ export default function DraggableObject({
       setObjectSize([size.x, size.y, size.z])
       const [objectWidth, objectHeight, objectDepth] = [size.x, size.y, size.z];
 
-      const minX = -groundSize.width / 2 - minEdge.x
-      const maxX = groundSize.width / 2 - maxEdge.x
-      const minZ = -groundSize.depth / 2 - minEdge.z
-      const maxZ = groundSize.depth / 2 - maxEdge.z
+      const collisionPreventionThreshold = 0.05;
+      const minX = -groundSize.width / 2 - minEdge.x + collisionPreventionThreshold;
+      const maxX = groundSize.width / 2 - maxEdge.x - collisionPreventionThreshold;
+      const minZ = -groundSize.depth / 2 - minEdge.z + collisionPreventionThreshold;
+      const maxZ = groundSize.depth / 2 - maxEdge.z - collisionPreventionThreshold;
 
       setDragLimits([
         [minX, maxX], // X limits
@@ -66,6 +69,13 @@ export default function DraggableObject({
     }
   }, [groundSize.width, groundSize.depth]) // Removed children dependency
 
+  const handleDoubleClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+      if (groupRef.current) {
+        setObject(groupRef.current);
+      }
+  }
+
   return (
     <DragControls
       onDragStart={() => setOrbitEnabled(false)}
@@ -77,8 +87,15 @@ export default function DraggableObject({
         position={objectPosition}
         onPointerOver={() => setIsHovered(true)}
         onPointerOut={() => setIsHovered(false)}
+        onDoubleClick={handleDoubleClick }
       >
-        {/* Pass hover state to children */}
+        {isHovered && (
+          <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[1, 1.2, 8]} />
+            <meshBasicMaterial color="#00ff00" transparent opacity={0.5} />
+          </mesh>
+        )}
+        
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
             return React.cloneElement(child as any, {

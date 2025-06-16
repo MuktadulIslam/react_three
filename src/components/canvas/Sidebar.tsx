@@ -1,5 +1,6 @@
 import BoxObject from "../objects/BoxObject"
 import Car from "../objects/Car"
+import CarModel from "../objects/Car2"
 import Chair from "../objects/Chair"
 import CustomObject from "../objects/CustomObject"
 import Table from "../objects/Table"
@@ -37,6 +38,18 @@ export default function Sidebar(
                 >
                     <div className="w-6 h-4 mr-3 bg-white/80 rounded-sm"></div>
                     <span>Car</span>
+                </div>
+                
+                <div
+                    className="flex items-center p-3 bg-gray-800 rounded-lg cursor-grab hover:bg-gray-700 transition-colors"
+                    draggable
+                    onDragStart={(e) => {
+                        e.dataTransfer.setData('text/plain', 'car-2')
+                        onDragStart(<CarModel />, 'car')
+                    }}
+                >
+                    <div className="w-6 h-4 mr-3 bg-white/80 rounded-sm"></div>
+                    <span>GLB Car Model</span>
                 </div>
 
                 <div

@@ -8,36 +8,24 @@ import RoomControls from '@/components/canvas/RoomControls'
 import Sidebar from './Sidebar';
 import { PlacedObject } from './types';
 import PlayGround from './PlayGround';
+import HtmlLoader from './SuspenseLoader';
+import ObjectControls from './ObjectControls';
+import { MeshProvider, useMeshContext } from './MeshContext';
 
-const HtmlLoader = () => {
-    return (
-        <Html center>
-            <div className="spinner"></div>
-            <style>{`
-        .spinner {
-          width: 50px;
-          height: 50px;
-          border: 5px solid rgba(255,255,255,0.3);
-          border-radius: 50%;
-          border-top: 4px solid #fff;
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
-        </Html>
-    )
-}
-
-export default function Room3DCanvas() {
+function Room3DCanvasContent() {
     // length means the length of x-axis 
     // width means the length of z-axis 
-    const [roomWidth, setRoomWidth] = useState<number>(10);
+    const [roomWidth, setRoomWidth] = useState<number>(30);
     const [roomLength, setRoomLength] = useState<number>(20);
     const [controlsVisible, setControlsVisible] = useState<boolean>(true);
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(true);
+    const [objects, setObjects] = useState<PlacedObject[]>([])
+    const [currentObject, setCurrentObject] = useState<{ component: React.ReactNode } | null>(null)
+    const [orbitEnabled, setOrbitEnabled] = useState(true)
+    const [freezeOrbit, setFreezeOrbit] = useState(false)
+
+    // Use mesh context
+    const { selectedObject, clearObject } = useMeshContext();
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -45,6 +33,19 @@ export default function Room3DCanvas() {
             if (event.ctrlKey && event.shiftKey && event.key === 'S') {
                 event.preventDefault(); // Prevent default browser save dialog
                 setSidebarVisible(prev => !prev);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            // Check for Ctrl+Shift+S combination
+            if (event.ctrlKey && event.shiftKey && event.key === 'F') {
+                event.preventDefault(); // Prevent default browser save dialog
+                setFreezeOrbit(prev => !prev);
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -66,13 +67,14 @@ export default function Room3DCanvas() {
         };
     }, []);
 
-    const [objects, setObjects] = useState<PlacedObject[]>([])
-    const [currentObject, setCurrentObject] = useState<{ component: React.ReactNode } | null>(null)
-    const [orbitEnabled, setOrbitEnabled] = useState(true)
 
     const handleDragStart = (component: React.ReactNode, dragData: string) => {
         setCurrentObject({ component })
     }
+
+    const handleDeleteMesh = () => {
+        console.log('Mesh deleted');
+    };
 
     return (
         <div className="w-screen h-screen bg-[#226764a8]">
@@ -85,6 +87,13 @@ export default function Room3DCanvas() {
                     onLengthChange={setRoomLength}
                 />
             }
+            {selectedObject && (
+                <ObjectControls
+                    object={selectedObject}
+                    onClose={clearObject}
+                    onDelete={handleDeleteMesh}
+                />
+            )}
 
             <Canvas
                 camera={{ position: [8, 4, 8], fov: 60 }}
@@ -107,7 +116,7 @@ export default function Room3DCanvas() {
                     />
 
                     {/* Room structure */}
-                     <PlayGround
+                    <PlayGround
                         key={`${roomWidth}-${roomLength}`} // This forces complete re-render
                         objects={objects}
                         setObjects={setObjects}
@@ -123,7 +132,7 @@ export default function Room3DCanvas() {
                     {/* Environment and controls */}
                     <Environment preset="apartment" />
                     <OrbitControls
-                        enabled={orbitEnabled}
+                        enabled={orbitEnabled && !freezeOrbit}
                         minDistance={1}
                         maxDistance={50}
                         enableDamping={true}
@@ -134,3 +143,11 @@ export default function Room3DCanvas() {
         </div>
     );
 };
+
+export default function Room3DCanvas() {
+    return (
+        <MeshProvider>
+            <Room3DCanvasContent />
+        </MeshProvider>
+    );
+}
