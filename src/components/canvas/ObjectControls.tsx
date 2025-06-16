@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mesh, Group, Object3D } from 'three';
 import { SelectableObject } from './types';
+import * as THREE from 'three'
 
 interface ObjectControlsProps {
   object: SelectableObject;
@@ -50,6 +51,16 @@ export default function ObjectControls({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
+  const updateObjectPosition = () => {
+    if (!object) return;
+
+    const box = new THREE.Box3().setFromObject(object)
+    const size = new THREE.Vector3()
+    box.getSize(size)
+    const minEdge = box.min.clone();
+    object.position.y -= minEdge.y;
+  }
+
   const handleScaleChange = (axis: number, value: number) => {
     const clampedValue = Math.max(MIN_SCALE, Math.min(MAX_SCALE, value));
     const newScale = [...scale] as [number, number, number];
@@ -61,6 +72,7 @@ export default function ObjectControls({
       if (axis === 0) object.scale.x = clampedValue;
       else if (axis === 1) object.scale.y = clampedValue;
       else if (axis === 2) object.scale.z = clampedValue;
+      updateObjectPosition();
     }
   };
 
@@ -75,6 +87,7 @@ export default function ObjectControls({
       if (axis === 0) object.rotation.x = radians;
       else if (axis === 1) object.rotation.y = radians;
       else if (axis === 2) object.rotation.z = radians;
+      updateObjectPosition();
     }
   };
 
@@ -87,6 +100,7 @@ export default function ObjectControls({
     // Apply to object immediately
     if (object) {
       object.scale.set(clampedValue, clampedValue, clampedValue);
+      updateObjectPosition();
     }
   };
 
@@ -102,6 +116,7 @@ export default function ObjectControls({
     if (object) {
       object.scale.set(1, 1, 1);
       object.rotation.set(0, 0, 0);
+      updateObjectPosition();
     }
   };
 
