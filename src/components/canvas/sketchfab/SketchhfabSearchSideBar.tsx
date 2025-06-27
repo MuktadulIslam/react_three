@@ -30,25 +30,7 @@ export default function SketchfabSearchSideBar({ show, setShow }: SketchfabSearc
     }
 
     return (<>
-        <div className={`h-screen w-3xl ${show ? '' : '-translate-x-full'} transition-all duration-300 overflow-hidden fixed left-0 top-0 bottom-0 z-50 backdrop-blur-sm bg-gradient-to-br from-slate-900/90 via-purple-900/90 to-slate-900/90  border-r border-gray-700 ${selectedModel ? '' : 'overflow-y-auto'}`}>
-            <SidebarHeader setShow={setShow} />
-            <SearchBar />
-
-            {models.length > 0 && (
-                <>
-                    <div className="grid grid-cols-3  gap-4 p-2">
-                        {models.map((model) => (
-                            <ThreeDModelCard
-                                key={model.uid}
-                                model={model}
-                                setSelectedModel={setSelectedModel}
-                                handleDownloadModel={handleDownloadModel}
-                            />
-                        ))}
-                    </div>
-                </>
-            )}
-            <ModelLoadingUtils />
+        <div className={`h-screen w-3xl ${show ? '' : '-translate-x-full'} transition-all duration-300 fixed left-0 top-0 bottom-0 z-50 backdrop-blur-sm bg-gradient-to-br from-slate-900/90 via-purple-900/90 to-slate-900/90  border-r border-gray-700`}>
             {/* 3D Model Viewer Modal */}
             {selectedModel != null && (
                 <ModelViewer
@@ -59,7 +41,26 @@ export default function SketchfabSearchSideBar({ show, setShow }: SketchfabSearc
                     }}
                 />
             )}
+            <div className="w-full h-full overflow-auto">
+                <SidebarHeader setShow={setShow} />
+                <SearchBar />
 
+                {models.length > 0 && (
+                    <>
+                        <div className="grid grid-cols-3  gap-4 p-2">
+                            {models.map((model) => (
+                                <ThreeDModelCard
+                                    key={model.uid}
+                                    model={model}
+                                    setSelectedModel={setSelectedModel}
+                                    handleDownloadModel={handleDownloadModel}
+                                />
+                            ))}
+                        </div>
+                    </>
+                )}
+                <ModelLoadingUtils />
+            </div>
         </div>
     </>)
 }
