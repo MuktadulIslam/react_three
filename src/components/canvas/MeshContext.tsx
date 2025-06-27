@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Group, Mesh, Object3D } from 'three';
 import { SelectableObject } from './types';
 
 interface MeshContextType {

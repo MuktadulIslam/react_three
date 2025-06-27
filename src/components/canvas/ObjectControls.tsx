@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Mesh, Group, Object3D } from 'three';
+import { Mesh } from 'three';
 import { SelectableObject } from './types';
 import * as THREE from 'three'
+import { FaRotateLeft, FaRotateRight } from "react-icons/fa6";
 
 interface ObjectControlsProps {
   object: SelectableObject;
@@ -21,7 +22,7 @@ export default function ObjectControls({
   // Constants
   const MAX_SCALE = 4;
   const MIN_SCALE = 0.1;
-  const ROTATION_STEPS = 10;
+  const rotationStepSize = 10
 
   // Initialize state from object properties
   useEffect(() => {
@@ -76,8 +77,16 @@ export default function ObjectControls({
     }
   };
 
+  // Normalize rotation to keep it within -360 to 360 degrees
+  const normalizeRotation = (degrees: number): number => {
+    while (degrees > 360) degrees -= 360;
+    while (degrees < -360) degrees += 360;
+    return degrees;
+  };
+
   const handleRotationChange = (axis: number, value: number) => {
-    const radians = (value * Math.PI) / 180;
+    const normalizedDegrees = normalizeRotation(value);
+    const radians = (normalizedDegrees * Math.PI) / 180;
     const newRotation = [...rotation] as [number, number, number];
     newRotation[axis] = radians;
     setRotation(newRotation);
@@ -89,6 +98,15 @@ export default function ObjectControls({
       else if (axis === 2) object.rotation.z = radians;
       updateObjectPosition();
     }
+  };
+
+  const handleQuickRotation = (axis: number, clockwise: boolean) => {
+    const currentRotationDegrees = (rotation[axis] * 180) / Math.PI;
+    const newRotationDegrees = clockwise
+      ? Math.round((currentRotationDegrees + 90) / 90) * 90
+      : Math.round((currentRotationDegrees - 90) / 90) * 90;
+
+    handleRotationChange(axis, newRotationDegrees);
   };
 
   const handleUniformScale = (value: number) => {
@@ -140,9 +158,6 @@ export default function ObjectControls({
     onClose();
   };
 
-  // Calculate rotation step size based on ROTATION_STEPS
-  const rotationStepSize = 360 / ROTATION_STEPS;
-
   return (
     <div className="z-50 absolute top-[350px] right-5 text-white font-sans text-sm bg-gray-900/90 bg-opacity-90 p-5 rounded-lg w-[270px]">
       <div className="flex justify-between items-center mb-4">
@@ -157,7 +172,7 @@ export default function ObjectControls({
 
       {/* Uniform Scale */}
       <div className="mb-4">
-        <label className="block mb-2 text-sm font-medium">
+        <label className="block mb-1 text-sm font-medium">
           Uniform Scale: {uniformScale.toFixed(2)}
         </label>
         <input
@@ -173,7 +188,7 @@ export default function ObjectControls({
 
       {/* Individual Scale Controls */}
       <div className="mb-4">
-        <h4 className="text-sm font-medium mb-2">Individual Scale</h4>
+        <h4 className="text-sm font-medium mb-1">Individual Scale</h4>
         <div className="grid grid-cols-3 gap-3">
           {['X', 'Y', 'Z'].map((axis, index) => (
             <div key={axis}>
@@ -194,21 +209,49 @@ export default function ObjectControls({
         </div>
       </div>
 
-      {/* Rotation Controls */}
-      <div className="mb-6">
-        <h4 className="text-sm font-medium mb-2">Rotation (degrees)</h4>
+      {/* Quick 90° Rotation Controls */}
+      <div className="mb-4">
+        <h4 className="text-sm font-medium mb-1">Quick Rotation (90°)</h4>
         <div className="grid grid-cols-3 gap-3">
           {['X', 'Y', 'Z'].map((axis, index) => (
-            <div key={axis}>
-              <label className="block mb-1 text-xs">
-                {axis}: {Math.round((rotation[index] * 180) / Math.PI)}°
+            <div key={axis} className="text-center">
+              <label className="block mb-2 text-xs font-medium">{axis}-Axis</label>
+              <div className="flex justify-center gap-1">
+                <button
+                  onClick={() => handleQuickRotation(index, true)}
+                  className="bg-gray-700 hover:bg-gray-600 p-1.5 rounded transition-colors flex items-center justify-center"
+                  title={`Rotate ${axis} axis -90°`}
+                >
+                  <FaRotateLeft />
+                </button>
+                <button
+                  onClick={() => handleQuickRotation(index, false)}
+                  className="bg-gray-700 hover:bg-gray-600 p-1.5 rounded transition-colors flex items-center justify-center"
+                  title={`Rotate ${axis} axis +90°`}
+                >
+                  <FaRotateRight />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Fine Rotation Controls */}
+      <div className="mb-6">
+        <h4 className="text-sm font-medium mb-1">Fine Rotation (degrees)</h4>
+        <div className="grid grid-cols-1 gap-1">
+          {['X', 'Y', 'Z'].map((axis, index) => (
+            <div key={axis} className="flex gap-1 items-center">
+              <label className="block mb-1 text-xs w-16">
+                {axis}: {Math.round(normalizeRotation((rotation[index] * 180) / Math.PI))}°
               </label>
               <input
                 type="range"
-                min="0"
+                min="-360"
                 max="360"
                 step={rotationStepSize}
-                value={(rotation[index] * 180) / Math.PI}
+                value={normalizeRotation((rotation[index] * 180) / Math.PI)}
                 onChange={(e) => handleRotationChange(index, parseFloat(e.target.value))}
                 className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
               />
@@ -236,7 +279,8 @@ export default function ObjectControls({
       <div className="mt-3 text-xs text-gray-400 flex w-full h-auto justify-center">
         <div>
           🔧 Double-click object to open controls<br />
-          🔧 Alt+C to close the ObjectControls
+          🔧 Alt+C to close the ObjectControls<br />
+          🔄 Click rotation icons for 90° turns
         </div>
       </div>
     </div>

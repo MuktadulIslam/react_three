@@ -5,18 +5,15 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows, useProgress, Html } from '@react-three/drei';
 import Room from '@/components/rooms/room1/Room';
 import RoomControls from '@/components/canvas/RoomControls'
-import Sidebar from './Sidebar';
+import Sidebar from './sidebar/Sidebar';
 import { PlacedObject } from './types';
 import PlayGround from './PlayGround';
 import HtmlLoader from './SuspenseLoader';
 import ObjectControls from './ObjectControls';
 import { MeshProvider, useMeshContext } from './MeshContext';
+import { RoomProvider, useRoomContext } from './RoomDimensionsContext';
 
 function Room3DCanvasContent() {
-    // length means the length of x-axis 
-    // width means the length of z-axis 
-    const [roomWidth, setRoomWidth] = useState<number>(30);
-    const [roomLength, setRoomLength] = useState<number>(20);
     const [controlsVisible, setControlsVisible] = useState<boolean>(true);
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(true);
     const [objects, setObjects] = useState<PlacedObject[]>([])
@@ -26,6 +23,7 @@ function Room3DCanvasContent() {
 
     // Use mesh context
     const { selectedObject, clearObject } = useMeshContext();
+    const { dimensions: roomDimensions, setLength: setRoomLength, setWidth: setRoomWidth } = useRoomContext();
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -81,8 +79,8 @@ function Room3DCanvasContent() {
             {sidebarVisible && <Sidebar onDragStart={handleDragStart} />}
             {controlsVisible &&
                 <RoomControls
-                    length={roomLength}
-                    width={roomWidth}
+                    length={roomDimensions.length}
+                    width={roomDimensions.width}
                     onWidthChange={setRoomWidth}
                     onLengthChange={setRoomLength}
                 />
@@ -96,11 +94,11 @@ function Room3DCanvasContent() {
             )}
 
             <Canvas
-                camera={{ position: [8, 4, 8], fov: 60 }}
-                // camera={{ fov: 60 }}
+                // camera={{ position: [8, 4, 8], fov: 60 }}
+                camera={{ fov: 60 }}
                 shadows
             >
-                {/* <axesHelper args={[5]} /> */}
+                <axesHelper args={[5]} />
                 <Suspense fallback={<HtmlLoader />}>
                     {/* Lighting */}
                     <ambientLight intensity={0.3} />
@@ -110,23 +108,23 @@ function Room3DCanvasContent() {
                         castShadow
                     />
                     <pointLight
-                        position={[roomWidth / 2 - 1, 3, -roomLength / 2 + 1]}
+                        position={[roomDimensions.width / 2 - 1, 3, -roomDimensions.length / 2 + 1]}
                         intensity={0.8}
                         color="#fff8dc"
                     />
 
                     {/* Room structure */}
                     <PlayGround
-                        key={`${roomWidth}-${roomLength}`} // This forces complete re-render
+                        key={`${roomDimensions.width}-${roomDimensions.length}`} // This forces complete re-render
                         objects={objects}
                         setObjects={setObjects}
                         currentObject={currentObject}
                         setCurrentObject={setCurrentObject}
                         setOrbitEnabled={setOrbitEnabled}
-                        roomWidth={roomWidth}
-                        roomLength={roomLength}
+                        roomWidth={roomDimensions.width}
+                        roomLength={roomDimensions.length}
                     >
-                        <Room width={roomWidth} length={roomLength} />
+                        <Room width={roomDimensions.width} length={roomDimensions.length} />
                     </PlayGround>
 
                     {/* Environment and controls */}
@@ -146,8 +144,10 @@ function Room3DCanvasContent() {
 
 export default function Room3DCanvas() {
     return (
-        <MeshProvider>
-            <Room3DCanvasContent />
-        </MeshProvider>
+        <RoomProvider initialDimensions={{ width: 20, length: 25, height: 5 }}>
+            <MeshProvider>
+                <Room3DCanvasContent />
+            </MeshProvider>
+        </RoomProvider>
     );
 }

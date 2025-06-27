@@ -22,7 +22,7 @@ export default function DraggableObject({
   const [isHovered, setIsHovered] = useState(false)
   const [objectPosition, setObjectPosition] = useState<[number, number, number]>([position[0], 0, position[2]]) // for now everything should be on ground
   const [dragLimits, setDragLimits] = useState<[[number, number], [number, number], [number, number]]>([[0, groundSize.width], [0, 0], [0, groundSize.depth]])
-   const [ringRadius, setRingRadius] = useState<{ inner: number, outer: number }>({ inner: 1, outer: 1.2 })
+  const [ringRadius, setRingRadius] = useState<{ inner: number, outer: number }>({ inner: 1, outer: 1.2 })
   const groupRef = useRef<THREE.Group>(null)
 
 
@@ -97,21 +97,12 @@ export default function DraggableObject({
         onDoubleClick={handleDoubleClick}
       >
         {isHovered && (
-          <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <ringGeometry args={[ringRadius.inner, ringRadius.outer, 8]} />
             <meshBasicMaterial color="#00ff00" transparent opacity={0.5} />
           </mesh>
         )}
-
-        {React.Children.map(children, (child) => {
-          if (React.isValidElement(child)) {
-            return React.cloneElement(child as any, {
-              ...((child.props as object) || {}),
-              isHovered
-            })
-          }
-          return child
-        })}
+        {children}
       </group>
     </DragControls>
   )
