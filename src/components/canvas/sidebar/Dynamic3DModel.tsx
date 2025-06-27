@@ -9,8 +9,8 @@ interface Dynamic3DModelProps {
 }
 
 export default function Dynamic3DModel({ url, fileType }: Dynamic3DModelProps) {
-    const gltf = fileType === 'glb' ? useGLTF(url) : null;
-    const fbx = fileType === 'fbx' ? useFBX(url) : null;
+    const gltf = useGLTF(url);
+    const fbx = useFBX(url);
 
     const clonedScene = useMemo(() => {
         if (fileType === 'glb' && gltf) {

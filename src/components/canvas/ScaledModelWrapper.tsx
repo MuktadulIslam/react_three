@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import * as THREE from 'three';
 import { useRoomContext } from './RoomDimensionsContext';
 
@@ -38,7 +38,7 @@ export default function ScaledModelWrapper({
             groupRef.current.scale.set(scaleDownFactor, scaleDownFactor, scaleDownFactor);
             previousScale.current = groupRef.current.scale;
         }
-    }, [roomDimensions]);
+    }, [roomDimensions, processScaling]);
 
     return (
         <>

@@ -48,9 +48,9 @@ export default function SketchfabSearchSideBar({ show, setShow }: SketchfabSearc
                 {models.length > 0 && (
                     <>
                         <div className="grid grid-cols-3  gap-4 p-2">
-                            {models.map((model) => (
+                            {models.map((model, index) => (
                                 <ThreeDModelCard
-                                    key={model.uid}
+                                    key={index}
                                     model={model}
                                     setSelectedModel={setSelectedModel}
                                     handleDownloadModel={handleDownloadModel}

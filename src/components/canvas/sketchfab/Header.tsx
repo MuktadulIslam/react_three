@@ -18,7 +18,7 @@ export default function SidebarHeader({ setShow }: SidebarHeaderProps) {
                 Explore & Download 3D Models
             </h1>
             <p className="text-base text-gray-300 max-w-3xl mx-auto">
-                Discover amazing free and downloadable 3D models from Sketchfab's vast collection
+                {"Discover amazing free and downloadable 3D models from Sketchfab's vast collection"}
             </p>
             <div className="mt-2 inline-flex items-center gap-2 bg-green-500/20 text-green-300 px-4 py-1 rounded-full text-sm">
                 💡 Tip: You may need a free Sketchfab account to download models

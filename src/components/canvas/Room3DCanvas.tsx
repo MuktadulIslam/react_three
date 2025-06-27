@@ -98,7 +98,7 @@ function Room3DCanvasContent() {
                 camera={{ fov: 60 }}
                 shadows
             >
-                <axesHelper args={[5]} />
+                {/* <axesHelper args={[5]} /> */}
                 <Suspense fallback={<HtmlLoader />}>
                     {/* Lighting */}
                     <ambientLight intensity={0.3} />

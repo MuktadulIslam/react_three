@@ -1,5 +1,6 @@
 import { Search, ExternalLink, Download, Heart, Eye, X, Play } from 'lucide-react';
 import { SketchfabModel } from './types';
+import Image from 'next/image';
 
 interface ThreeDModelCardProps {
     model: SketchfabModel;
@@ -36,7 +37,9 @@ export default function ThreeDModelCard({ model, setSelectedModel, handleDownloa
             {/* Thumbnail */}
             <div className="relative aspect-square overflow-hidden">
                 {model.thumbnails?.images?.[0]?.url ? (
-                    <img
+                    <Image
+                        width={300}
+                        height={300}
                         src={model.thumbnails.images[0].url}
                         alt={model.name || 'Untitled Model'}
                         className="w-full h-full object-cover"
@@ -59,7 +62,9 @@ export default function ThreeDModelCard({ model, setSelectedModel, handleDownloa
                 {/* Author */}
                 <div className="flex items-center gap-2 mb-1">
                     {model.user?.avatar?.images?.[0]?.url && (
-                        <img
+                        <Image
+                            width={50}
+                            height={50}
                             src={model.user.avatar.images[0].url}
                             alt={model.user.displayName || 'User'}
                             className="w-6 h-6 rounded-full"
