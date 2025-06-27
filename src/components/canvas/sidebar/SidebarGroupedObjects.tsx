@@ -8,12 +8,7 @@ interface SidebarGroupedObjectsProps {
 }
 
 export default function SidebarGroupedObjects({ objectGroups, onDragStart }: SidebarGroupedObjectsProps) {
-    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-        vehicles: true, // Start with vehicles expanded
-        furniture: false,
-        primitives: false,
-        custom: false
-    });
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
     const toggleGroup = (groupId: string) => {
         setExpandedGroups(prev => ({
@@ -35,7 +30,7 @@ export default function SidebarGroupedObjects({ objectGroups, onDragStart }: Sid
 
                 <div className="space-y-3">
                     {objectGroups.map((group, index) => (
-                        <div key={index} className="bg-gray-800/40 rounded-xl border border-gray-700/40 overflow-hidden">
+                        <div key={group.id} className="bg-gray-800/40 rounded-xl border border-gray-700/40 overflow-hidden">
                             {/* Group Header */}
                             <button
                                 onClick={() => toggleGroup(group.id)}
@@ -70,7 +65,7 @@ export default function SidebarGroupedObjects({ objectGroups, onDragStart }: Sid
                                 <div className="px-2 pb-2 space-y-2">
                                     {group.objects.map((obj, index) => (
                                         <DraggableObjectItem
-                                            key={index}
+                                            key={obj.id}
                                             object={obj}
                                             groupColor={group.color}
                                             onDragStart={onDragStart}

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import BoxObject from "../../objects/BoxObject"
 import Car from "../../objects/Car"
 import CarModel from "../../objects/Car2"
@@ -10,7 +10,7 @@ import TableModel from "../../objects/TableModel"
 import SketchfabSearchSideBar from '../sketchfab/SketchhfabSearchSideBar';
 import SidebarHeader from "./SidebarHeader"
 import SidebarGroupedObjects from "./SidebarGroupedObjects"
-import { DraggableObjectGroup } from './types'
+import { DraggableObjectGroup, DraggableObjectData } from './types'
 import DeskSign from "@/components/objects/craftxr/DeskSign"
 import DisabilityButton from "@/components/objects/craftxr/DisabilityButton"
 import FaxMachine from "@/components/objects/craftxr/FaxMachine"
@@ -27,14 +27,56 @@ import Succulent from "@/components/objects/craftxr/Succulent"
 import TissueBox from "@/components/objects/craftxr/TissueBox"
 import WaitingBench from "@/components/objects/craftxr/WaitingBench"
 import Wheelchair from "@/components/objects/craftxr/Wheelchair"
+import Dynamic3DModel from "./Dynamic3DModel"
+
+interface UploadedFile {
+    id: string;
+    name: string;
+    url: string;
+    fileType: 'glb' | 'fbx';
+    uploadDate: Date;
+}
 
 export default function Sidebar(
     { onDragStart }:
         { onDragStart: (component: React.ReactNode, dragData: string) => void }
 ) {
     const [showSketchfabSearch, setShowSketchfabSearch] = useState<boolean>(false);
+    const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+
+    const handleFileUpload = useCallback((file: File) => {
+        const fileExtension = file.name.split('.').pop()?.toLowerCase() as 'glb' | 'fbx';
+        const fileUrl = URL.createObjectURL(file);
+
+        const uploadedFile: UploadedFile = {
+            id: `uploaded-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            name: file.name.replace(/\.[^/.]+$/, ""), // Remove file extension
+            url: fileUrl,
+            fileType: fileExtension,
+            uploadDate: new Date()
+        };
+
+        setUploadedFiles(prev => [...prev, uploadedFile]);
+    }, []);
+
+    // Convert uploaded files to draggable objects
+    const uploadedObjects: DraggableObjectData[] = uploadedFiles.map(file => ({
+        id: file.id,
+        component: <Dynamic3DModel url={file.url} fileType={file.fileType} />,
+        name: file.name,
+        icon: file.fileType === 'glb' ? '📦' : '🎭',
+        description: `Uploaded ${file.fileType.toUpperCase()} model`
+    }));
 
     const objectGroups: DraggableObjectGroup[] = [
+        // Add uploaded files group if there are any uploaded files
+        ...(uploadedFiles.length > 0 ? [{
+            id: 'uploaded',
+            name: 'Uploaded Models',
+            icon: '☁️',
+            color: 'from-emerald-500 to-teal-500',
+            objects: uploadedObjects
+        }] : []),
         {
             id: 'vehicles',
             name: 'Vehicles',
@@ -252,6 +294,7 @@ export default function Sidebar(
             <div className="absolute left-0 top-0 h-full w-80 bg-gray-900/90 backdrop-blur-md text-white flex flex-col z-40 shadow-2xl border-r border-gray-700/50 overflow-hidden">
                 <SidebarHeader
                     setShowSketchfabSearch={setShowSketchfabSearch}
+                    onFileUpload={handleFileUpload}
                 />
 
                 <SidebarGroupedObjects
