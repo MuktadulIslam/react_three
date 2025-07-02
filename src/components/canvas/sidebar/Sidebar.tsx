@@ -64,7 +64,7 @@ export default function Sidebar(
         id: file.id,
         component: <Dynamic3DModel url={file.url} fileType={file.fileType} />,
         name: file.name,
-        icon: file.fileType === 'glb' ? '📦' : '🎭',
+        icon: file.fileType === 'glb' ? '📦' : '🗃️',
         description: `Uploaded ${file.fileType.toUpperCase()} model`
     }));
 

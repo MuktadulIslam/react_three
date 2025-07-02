@@ -1,10 +1,21 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { SelectableObject } from './types';
+import { SelectableObject, PlacedObject } from './types';
 
 interface MeshContextType {
+  // Objects management
+  objects: PlacedObject[];
+  setObjects: React.Dispatch<React.SetStateAction<PlacedObject[]>>;
+  addObject: (object: PlacedObject) => void;
+  removeObject: (objectId: string) => void;
+
+  // Selected object management
   selectedObject: SelectableObject;
-  setObject: (object: SelectableObject) => void;
+  selectedObjectId: string | null;
+  setObject: (object: SelectableObject, objectId: string) => void;
   clearObject: () => void;
+
+  // Object controls visibility
+  isObjectControlsVisible: boolean;
 }
 
 const MeshContext = createContext<MeshContextType | undefined>(undefined);
@@ -22,20 +33,52 @@ interface MeshProviderProps {
 }
 
 export function MeshProvider({ children }: MeshProviderProps) {
-  const [selectedObject, setSelectedObject] = useState<SelectableObject>(null);
+  // Objects state
+  const [objects, setObjects] = useState<PlacedObject[]>([]);
 
-  const setObject = (object: SelectableObject) => {
+  // Selected object state
+  const [selectedObject, setSelectedObject] = useState<SelectableObject>(null);
+  const [selectedObjectId, setSelectedObjectId] = useState<string | null>(null);
+
+  // Object controls visibility
+  const [isObjectControlsVisible, setObjectControlsVisible] = useState<boolean>(false);
+
+  // Helper functions
+  const addObject = (object: PlacedObject) => {
+    setObjects(prev => [...prev, object]);
+  };
+
+  const removeObject = (objectId: string) => {
+    setObjects(prev => prev.filter(obj => obj.id !== objectId));
+
+    // If the deleted object is currently selected, clear selection
+    if (selectedObjectId === objectId) {
+      clearObject();
+    }
+  };
+
+  const setObject = (object: SelectableObject, objectId: string) => {
     setSelectedObject(object);
+    setSelectedObjectId(objectId);
+    setObjectControlsVisible(true);
   };
 
   const clearObject = () => {
     setSelectedObject(null);
+    setSelectedObjectId(null);
+    setObjectControlsVisible(false);
   };
 
   const value: MeshContextType = {
+    objects,
+    setObjects,
+    addObject,
+    removeObject,
     selectedObject,
+    selectedObjectId,
     setObject,
     clearObject,
+    isObjectControlsVisible,
   };
 
   return (
@@ -43,4 +86,4 @@ export function MeshProvider({ children }: MeshProviderProps) {
       {children}
     </MeshContext.Provider>
   );
-};
+}

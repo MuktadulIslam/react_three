@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { useMeshContext } from "./MeshContext"
 
 interface DraggableObjectProps {
+  objectId: string,
   position: [number, number, number],
   groundSize: { width: number, depth: number },
   setOrbitEnabled: (enabled: boolean) => void,
@@ -12,6 +13,7 @@ interface DraggableObjectProps {
 }
 
 export default function DraggableObject({
+  objectId,
   position,
   groundSize,
   setOrbitEnabled,
@@ -79,7 +81,7 @@ export default function DraggableObject({
   const handleDoubleClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     if (groupRef.current) {
-      setObject(groupRef.current);
+      setObject(groupRef.current, objectId);
     }
   }
 
