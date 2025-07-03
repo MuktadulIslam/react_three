@@ -6,7 +6,7 @@ import { FaRotateLeft, FaRotateRight } from "react-icons/fa6";
 import { useMeshContext } from './MeshContext';
 
 export default function ObjectControls() {
-  const { selectedObject, selectedObjectId, isObjectControlsVisible, removeObject, clearObject } = useMeshContext();
+  const { selectedObject, selectedObjectId, isObjectControlsVisible, removeObject, clearObject, fixedRingRadius } = useMeshContext();
   const [scale, setScale] = useState<[number, number, number]>([1, 1, 1]);
   const [rotation, setRotation] = useState<[number, number, number]>([0, 0, 0]);
   const [uniformScale, setUniformScale] = useState<number>(1);
@@ -70,6 +70,9 @@ export default function ObjectControls() {
       else if (axis === 1) selectedObject.scale.y = clampedValue;
       else if (axis === 2) selectedObject.scale.z = clampedValue;
       updateObjectPosition();
+      if (fixedRingRadius) {
+        fixedRingRadius();
+      }
     }
   };
 
@@ -93,6 +96,9 @@ export default function ObjectControls() {
       else if (axis === 1) selectedObject.rotation.y = radians;
       else if (axis === 2) selectedObject.rotation.z = radians;
       updateObjectPosition();
+      if (fixedRingRadius) {
+        fixedRingRadius();
+      }
     }
   };
 
@@ -115,6 +121,10 @@ export default function ObjectControls() {
     if (selectedObject) {
       selectedObject.scale.set(clampedValue, clampedValue, clampedValue);
       updateObjectPosition();
+      if (fixedRingRadius) {
+        fixedRingRadius();
+      }
+
     }
   };
 
@@ -131,6 +141,9 @@ export default function ObjectControls() {
       selectedObject.scale.set(1, 1, 1);
       selectedObject.rotation.set(0, 0, 0);
       updateObjectPosition();
+      if (fixedRingRadius) {
+        fixedRingRadius();
+      }
     }
   };
 

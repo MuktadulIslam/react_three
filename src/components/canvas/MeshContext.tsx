@@ -14,6 +14,10 @@ interface MeshContextType {
   setObject: (object: SelectableObject, objectId: string) => void;
   clearObject: () => void;
 
+  // Position fixing callback (set by the selected DraggableObject)
+  fixedRingRadius: (() => void) | null;
+  setFixedRingRadiusCallback: (callback: (() => void) | null) => void;
+
   // Object controls visibility
   isObjectControlsVisible: boolean;
 }
@@ -39,6 +43,9 @@ export function MeshProvider({ children }: MeshProviderProps) {
   // Selected object state
   const [selectedObject, setSelectedObject] = useState<SelectableObject>(null);
   const [selectedObjectId, setSelectedObjectId] = useState<string | null>(null);
+
+  // Position fixing callback
+  const [fixedRingRadius, setFixedRingRadiusCallback] = useState<(() => void) | null>(null);
 
   // Object controls visibility
   const [isObjectControlsVisible, setObjectControlsVisible] = useState<boolean>(false);
@@ -67,6 +74,7 @@ export function MeshProvider({ children }: MeshProviderProps) {
     setSelectedObject(null);
     setSelectedObjectId(null);
     setObjectControlsVisible(false);
+    setFixedRingRadiusCallback(null);
   };
 
   const value: MeshContextType = {
@@ -78,6 +86,8 @@ export function MeshProvider({ children }: MeshProviderProps) {
     selectedObjectId,
     setObject,
     clearObject,
+    fixedRingRadius,
+    setFixedRingRadiusCallback,
     isObjectControlsVisible,
   };
 
