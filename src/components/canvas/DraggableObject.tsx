@@ -99,6 +99,14 @@ export default function DraggableObject({
     }
   }
 
+  const handleClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (groupRef.current && selectedObjectId == objectId) {
+      setObject(groupRef.current, objectId);
+      setFixedRingRadiusCallback(() => fixedRingRadius);
+    }
+  }
+
   return (
     <DragControls
       onDragStart={() => setOrbitEnabled(false)}
@@ -119,6 +127,7 @@ export default function DraggableObject({
         )}
         <group
           onDoubleClick={handleDoubleClick}
+          onClick={handleClick}
           ref={groupRef}
         >
           {children}

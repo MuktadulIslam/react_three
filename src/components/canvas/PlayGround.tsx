@@ -27,7 +27,7 @@ export default function PlayGround({
 }: PlayGroundProps) {
     const { camera, raycaster, gl } = useThree();
     const groundRef = useRef<THREE.Mesh>(null);
-    const { objects, addObject } = useMeshContext();
+    const { objects, addObject, clearObject } = useMeshContext();
 
     // Handle drop events
     useEffect(() => {
@@ -76,6 +76,15 @@ export default function PlayGround({
         };
     }, [currentObject, setCurrentObject, camera, raycaster, gl, addObject]);
 
+    // Handle floor click to deselect objects
+    const handleFloorClick = (event: React.MouseEvent) => {
+        // Stop event propagation to prevent conflicts with object selection
+        event.stopPropagation();
+
+        // Clear the selected object
+        clearObject();
+    };
+
     return (
         <>
             {/* Render dropped objects */}
@@ -97,7 +106,12 @@ export default function PlayGround({
             {children}
 
             {/* Playground floor */}
-            <mesh ref={groundRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+            <mesh
+                ref={groundRef}
+                rotation={[-Math.PI / 2, 0, 0]}
+                position={[0, 0, 0]}
+                onClick={handleFloorClick}
+            >
                 <planeGeometry args={[roomLength, roomWidth]} />
                 <meshStandardMaterial color="lightgray" opacity={0.7} transparent />
             </mesh>
