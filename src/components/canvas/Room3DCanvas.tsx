@@ -36,9 +36,10 @@ function Room3DCanvasContent() {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
+
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            // Check for Ctrl+Shift+S combination
+            // Check for Ctrl+Shift+F combination
             if (event.ctrlKey && event.shiftKey && event.key === 'F') {
                 event.preventDefault(); // Prevent default browser save dialog
                 setFreezeOrbit(prev => !prev);
@@ -49,6 +50,7 @@ function Room3DCanvasContent() {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
+
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             // Check for Ctrl+Shift+Z combination
@@ -63,14 +65,16 @@ function Room3DCanvasContent() {
         };
     }, []);
 
-
     const handleDragStart = (component: React.ReactNode) => {
         setCurrentObject({ component })
     }
 
     return (
         <div className="w-screen h-screen bg-[#226764a8]">
-            <Sidebar onDragStart={handleDragStart} visible={sidebarVisible} />
+            <Sidebar
+                onDragStart={handleDragStart}
+                visible={sidebarVisible}
+            />
             {controlsVisible &&
                 <RoomControls
                     length={roomDimensions.length}
