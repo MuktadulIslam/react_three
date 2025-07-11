@@ -11,7 +11,6 @@ import { SketchfabReduxProvider } from "./store/SketchfabReduxProvider";
 import { useAuth } from "./store/hooks/useAuth";
 import { useDownload } from "./store/hooks/useDownload";
 import { NotificationManager } from "./Notification";
-import SketchfabSearchSkeleton from "./SketchfabSearchSkeleton";
 
 interface SketchfabSearchSideBarProps {
     show: boolean;
@@ -152,14 +151,31 @@ function SketchfabSearch({ show, setShow, onAddModelToSidebar, existingModelUids
                 <ModelViewer
                     model={selectedModel}
                     handleDownloadModel={handleDownloadModel}
+                    handleAddToSidebar={handleAddToSidebar}
                     closeViewer={() => {
                         setSelectedModel(null);
                     }}
+                    addingToSidebarId={addingToSidebarId}
+                    addToSidebarProgress={addToSidebarProgress}
+                    isAlreadyInSidebar={existingModelUids.includes(selectedModel.uid)}
                 />
             )}
             <div className="w-full h-full overflow-auto">
                 <SidebarHeader setShow={setShow} />
-                {loading ? <div className="h-full w-full flex justify-center items-center text-gray-800 text-xl font-semibold">Loading...</div> : !authenticated ? (
+                {loading ? (
+                    <div className="h-full w-full flex flex-col justify-center items-center text-gray-800">
+                        <div className="mb-4">
+                            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-blue-400"></div>
+                        </div>
+                        <div className="text-xl font-semibold">Loading...</div>
+                        <div className="text-sm text-gray-600 mt-2">Connecting to Sketchfab</div>
+                        <div className="flex gap-1 mt-3">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
+                    </div>
+                ) : !authenticated ? (
                     <SketchfabLogin />
                 ) : (
                     <>
