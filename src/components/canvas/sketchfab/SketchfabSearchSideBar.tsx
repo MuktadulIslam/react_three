@@ -11,6 +11,7 @@ import { SketchfabReduxProvider } from "./store/SketchfabReduxProvider";
 import { useAuth } from "./store/hooks/useAuth";
 import { useDownload } from "./store/hooks/useDownload";
 import { NotificationManager } from "./Notification";
+import SketchfabSearchSkeleton from "./SketchfabSearchSkeleton";
 
 interface SketchfabSearchSideBarProps {
     show: boolean;
@@ -47,7 +48,7 @@ function SketchfabSearch({ show, setShow, onAddModelToSidebar, existingModelUids
     const [addToSidebarProgress, setAddToSidebarProgress] = useState<number>(0);
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
     const { models, SearchBar, ModelLoadingUtils } = SearchBarUtils();
-    const { authenticated } = useAuth();
+    const { authenticated, loading } = useAuth();
     const { downloadGLB, getDownloadOptions } = useDownload();
 
     const addNotification = (message: string, type: 'success' | 'error' | 'info' = 'info', duration = 3000) => {
@@ -158,7 +159,7 @@ function SketchfabSearch({ show, setShow, onAddModelToSidebar, existingModelUids
             )}
             <div className="w-full h-full overflow-auto">
                 <SidebarHeader setShow={setShow} />
-                {!authenticated ? (
+                {loading ? <div className="h-full w-full flex justify-center items-center text-gray-800 text-xl font-semibold">Loading...</div> : !authenticated ? (
                     <SketchfabLogin />
                 ) : (
                     <>
