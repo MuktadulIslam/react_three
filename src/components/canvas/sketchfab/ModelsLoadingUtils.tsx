@@ -14,14 +14,14 @@ export default function ModelLoadingUtils({ hasNext, isLoading, modelsLength, is
         {isLoading && modelsLength == 0 && (
             <div className="text-center py-6">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-blue-400"></div>
-                <p className="text-gray-300 mt-4">Searching for models...</p>
+                <p className="text-gray-500 mt-4">Searching for models...</p>
             </div>
         )}
         {/* Results */}
         {hasSearched && !isLoading && modelsLength === 0 && !isError && (
             <div className="text-center py-12">
-                <p className="text-gray-400 text-xl">No free downloadable models found.</p>
-                <p className="text-gray-500 mt-2">Try a different search term or check if there are downloadable models available</p>
+                <p className="text-red-400 font-semibold text-xl">No free downloadable models found.</p>
+                <p className="text-red-500 mt-2">Try a different search term or check if there are downloadable models available</p>
             </div>
         )}
         {/* Show More Button */}
@@ -40,7 +40,7 @@ export default function ModelLoadingUtils({ hasNext, isLoading, modelsLength, is
         {isLoading && modelsLength != 0 && (
             <div className="text-center my-5">
                 <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-4 border-blue-400"></div>
-                <p className="text-gray-300 mt-2 text-sm">Loading more models...</p>
+                <p className="text-gray-500 mt-2 text-sm">Loading more models...</p>
             </div>
         )}
         {/* End of Results */}

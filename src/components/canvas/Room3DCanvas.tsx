@@ -70,7 +70,7 @@ function Room3DCanvasContent() {
 
     return (
         <div className="w-screen h-screen bg-[#226764a8]">
-            {sidebarVisible && <Sidebar onDragStart={handleDragStart} />}
+            <Sidebar onDragStart={handleDragStart} visible={sidebarVisible} />
             {controlsVisible &&
                 <RoomControls
                     length={roomDimensions.length}

@@ -38,8 +38,8 @@ interface UploadedFile {
 }
 
 export default function Sidebar(
-    { onDragStart }:
-        { onDragStart: (component: React.ReactNode) => void }
+    { visible, onDragStart }:
+        { visible: boolean, onDragStart: (component: React.ReactNode) => void }
 ) {
     const [showSketchfabSearch, setShowSketchfabSearch] = useState<boolean>(false);
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
@@ -291,7 +291,7 @@ export default function Sidebar(
         <div>
             <SketchfabSearchSideBar show={showSketchfabSearch} setShow={setShowSketchfabSearch} />
 
-            <div className="absolute left-0 top-0 h-full w-80 bg-gray-900/90 backdrop-blur-md text-white flex flex-col z-40 shadow-2xl border-r border-gray-700/50 overflow-hidden">
+            <div className={`absolute left-0 top-0 h-full w-80 ${visible ? '' : '-translate-x-80'} transition-all duration-200 bg-gray-900/90 backdrop-blur-md text-white flex flex-col z-40 shadow-2xl border-r border-gray-700/50 overflow-hidden`}>
                 <SidebarHeader
                     setShowSketchfabSearch={setShowSketchfabSearch}
                     onFileUpload={handleFileUpload}
