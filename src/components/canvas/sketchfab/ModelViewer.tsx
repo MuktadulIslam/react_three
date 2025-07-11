@@ -1,4 +1,4 @@
-import { Search, ExternalLink, Download, Heart, Eye, X, Play } from 'lucide-react';
+import { Download, X } from 'lucide-react';
 import { SketchfabModel } from './types';
 import { useEffect, useRef } from 'react';
 
@@ -24,7 +24,7 @@ export default function ModelViewer({ model, handleDownloadModel, closeViewer }:
     return (
         <>
             <div className="absolute top-0 border-0 w-full h-full ease-out inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3">
-                <div ref={popupRef} className="w-full aspect-square scale-0 transition-transform duration-500 bg-gradient-to-br from-blue-600/60 via-purple-600/60 to-blue-900/60 rounded-2xl flex flex-col">
+                <div ref={popupRef} className="w-full aspect-square scale-0 transition-transform duration-500 bg-gradient-to-br from-white/60 to-blue-500/30 rounded-2xl flex flex-col">
                     {/* Modal Header */}
                     <div className="flex items-center justify-between px-6 py-2 border-b border-white">
                         <div className="flex-1">
@@ -43,7 +43,7 @@ export default function ModelViewer({ model, handleDownloadModel, closeViewer }:
                             </button>
                             <button
                                 onClick={closeViewer}
-                                className="bg-gradient-to-br from-red-600/60 via-red-400/60 to-stone-400/80 hover:bg-gray-600 text-white p-2 rounded-lg transition-colors duration-200"
+                                className="bg-gradient-to-br from-red-600 via-red-400 to-red-400/50 hover:bg-gray-600 text-white p-2 rounded-lg transition-colors duration-200"
                             >
                                 <X size={20} />
                             </button>

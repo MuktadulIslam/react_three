@@ -39,7 +39,7 @@ function SearchBar({ onSearch, currentQuery }: SearchBarProps) {
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Search for free downloadable 3D models..."
-                    className="w-full px-6 py-2 text-base bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                    className="w-full px-6 py-2 text-base font-semibold bg-white/50 backdrop-blur-md border border-gray-800 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
                 />
             </div>
         </div>

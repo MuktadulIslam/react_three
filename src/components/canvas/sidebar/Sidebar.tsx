@@ -7,7 +7,7 @@ import ChildrenTableModel from "../../objects/ChildrenTableModel"
 import CustomObject from "../../objects/CustomObject"
 import Table from "../../objects/Table"
 import TableModel from "../../objects/TableModel"
-import SketchfabSearchSideBar from '../sketchfab/SketchhfabSearchSideBar';
+import SketchfabSearchSideBar from '../sketchfab/SketchfabSearchSideBar';
 import SidebarHeader from "./SidebarHeader"
 import SidebarGroupedObjects from "./SidebarGroupedObjects"
 import { DraggableObjectGroup, DraggableObjectData } from './types'
@@ -39,7 +39,7 @@ interface UploadedFile {
 
 export default function Sidebar(
     { onDragStart }:
-        { onDragStart: (component: React.ReactNode, dragData: string) => void }
+        { onDragStart: (component: React.ReactNode) => void }
 ) {
     const [showSketchfabSearch, setShowSketchfabSearch] = useState<boolean>(false);
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);

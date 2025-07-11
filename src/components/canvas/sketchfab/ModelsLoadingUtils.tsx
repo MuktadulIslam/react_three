@@ -1,4 +1,4 @@
-import { Search, ExternalLink, Download, Heart, Eye, X, Play } from 'lucide-react';
+import { Download, } from 'lucide-react';
 
 interface ModelLoadingUtilsProps {
     hasNext: boolean,

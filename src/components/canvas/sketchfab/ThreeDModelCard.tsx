@@ -1,4 +1,4 @@
-import { Search, ExternalLink, Download, Heart, Eye, X, Play } from 'lucide-react';
+import { ExternalLink, Download, Heart, Eye, Play } from 'lucide-react';
 import { SketchfabModel } from './types';
 import Image from 'next/image';
 
@@ -6,9 +6,18 @@ interface ThreeDModelCardProps {
     model: SketchfabModel;
     setSelectedModel: (model: SketchfabModel) => void;
     handleDownloadModel: (model: SketchfabModel) => void;
+    downloadingModelId?: string | null; // Add this prop to track which model is downloading
 }
 
-export default function ThreeDModelCard({ model, setSelectedModel, handleDownloadModel }: ThreeDModelCardProps) {
+export default function ThreeDModelCard({
+    model,
+    setSelectedModel,
+    handleDownloadModel,
+    downloadingModelId
+}: ThreeDModelCardProps) {
+    // Check if this specific model is being downloaded
+    const isThisModelDownloading = downloadingModelId === model.uid;
+
     const formatNumber = (num: number | undefined): string => {
         if (num === undefined || num === null) {
             return '0';
@@ -70,20 +79,20 @@ export default function ThreeDModelCard({ model, setSelectedModel, handleDownloa
                             className="w-6 h-6 rounded-full"
                         />
                     )}
-                    <span className="text-gray-300 text-sm truncate">
+                    <span className="text-gray-700 text-sm font-semibold truncate">
                         {model.user?.displayName || 'Unknown User'}
                     </span>
                 </div>
 
                 {/* Description */}
                 {model.description && (
-                    <p className="text-gray-400 text-sm mb-1 line-clamp-2">
+                    <p className="text-gray-700 text-xs mb-1 line-clamp-2">
                         {model.description}
                     </p>
                 )}
 
                 {/* Stats */}
-                <div className="flex items-center gap-4 mb-2 text-gray-300 text-sm">
+                <div className="flex items-center gap-4 mb-2 text-gray-500 text-sm">
                     <div className="flex items-center gap-1">
                         <Eye size={14} />
                         <span>{formatNumber(model.viewCount)}</span>
@@ -92,7 +101,7 @@ export default function ThreeDModelCard({ model, setSelectedModel, handleDownloa
                         <Heart size={14} />
                         <span>{formatNumber(model.likeCount)}</span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 relative">
                         <Download size={14} />
                         <span>{formatNumber(model.downloadCount)}</span>
                     </div>
@@ -104,7 +113,7 @@ export default function ThreeDModelCard({ model, setSelectedModel, handleDownloa
                         {model.tags.slice(0, 3).map((tag, index) => (
                             <span
                                 key={index}
-                                className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded-full"
+                                className="px-2 pt-0.5 pb-1  bg-gray-600/20 text-[#212b3c] text-xs border border-gray-500 rounded-full"
                             >
                                 {tag.name}
                             </span>
@@ -116,30 +125,34 @@ export default function ThreeDModelCard({ model, setSelectedModel, handleDownloa
                 <div className="flex gap-2">
                     <button
                         onClick={() => handleViewModel(model)}
-                        className="flex-1 bg-gradient-to-r from-green-500 to-teal-600 text-white py-2 px-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition-all duration-300 text-center text-sm font-medium flex items-center justify-center gap-1"
+                        className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition-all duration-300 text-center text-sm font-medium flex items-center justify-center gap-1"
                     >
                         <Play size={14} />
                         View 3D
                     </button>
                     <button
                         onClick={() => handleDownloadModel(model)}
-                        className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-sm font-medium flex items-center justify-center gap-1"
+                        className="bg-gradient-to-r  from-blue-500 to-green-500 text-white w-9 aspect-square rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 text-sm font-medium flex items-center justify-center gap-1"
                         title="Download Model"
+                        disabled={isThisModelDownloading}
                     >
-                        <Download size={14} />
+                        {isThisModelDownloading ?
+                            <div className="h-5 aspect-square border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                            : <Download size={14} />
+                        }
                     </button>
                     <a
                         href={model.viewerUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="bg-gradient-to-r from-gray-600 to-gray-700 text-white py-2 px-3 rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300 text-sm font-medium flex items-center justify-center gap-1"
+                        className="bg-gradient-to-r from-gray-600 to-gray-700 text-white w-9 aspect-square rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300 text-sm font-medium flex items-center justify-center gap-1"
                     >
                         <ExternalLink size={14} />
                     </a>
                 </div>
 
                 {/* Date */}
-                <div className="text-gray-500 text-xs mt-2 text-center">
+                <div className="text-gray-600 text-xs mt-2 text-center">
                     {formatDate(model.createdAt)}
                 </div>
             </div>

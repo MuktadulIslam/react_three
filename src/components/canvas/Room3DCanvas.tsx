@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, Suspense, useRef } from 'react';
-import * as THREE from 'three'
-import { Canvas, useFrame } from '@react-three/fiber';
+import React, { useState, useEffect, Suspense, } from 'react';
+import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows, useProgress, Html } from '@react-three/drei';
 import Room from '@/components/rooms/room1/Room';
 import RoomControls from '@/components/canvas/RoomControls'
 import Sidebar from './sidebar/Sidebar';
-import { PlacedObject } from './types';
 import PlayGround from './PlayGround';
 import HtmlLoader from './SuspenseLoader';
 import ObjectControls from './ObjectControls';
@@ -66,7 +64,7 @@ function Room3DCanvasContent() {
     }, []);
 
 
-    const handleDragStart = (component: React.ReactNode, dragData: string) => {
+    const handleDragStart = (component: React.ReactNode) => {
         setCurrentObject({ component })
     }
 
