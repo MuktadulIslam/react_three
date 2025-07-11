@@ -70,7 +70,7 @@ function Room3DCanvasContent() {
     }
 
     return (
-        <div className="w-screen h-screen bg-[#226764a8]">
+        <div className="w-full h-full relative overflow-hidden bg-[#226764a8]">
             <Sidebar
                 onDragStart={handleDragStart}
                 visible={sidebarVisible}

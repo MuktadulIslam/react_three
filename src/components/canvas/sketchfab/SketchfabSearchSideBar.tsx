@@ -139,7 +139,7 @@ function SketchfabSearch({ show, setShow, onAddModelToSidebar, existingModelUids
     };
 
     return (
-        <div className={`h-screen w-3xl ${show ? '' : '-translate-x-full'} transition-all duration-300 fixed left-0 top-0 bottom-0 z-50 backdrop-blur-sm bg-gradient-to-br from-white/40 to-sky-200/20 border-r-2 border-gray-400`}>
+        <div className={`h-screen w-3xl ${show ? '' : '-translate-x-full'} transition-all duration-300 absolute left-0 top-0 bottom-0 z-50 backdrop-blur-sm bg-gradient-to-br from-white/40 to-sky-200/20 border-r-2 border-gray-400`}>
             {/* Notifications */}
             <NotificationManager
                 notifications={notifications}

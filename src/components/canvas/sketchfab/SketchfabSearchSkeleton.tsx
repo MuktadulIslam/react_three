@@ -73,7 +73,7 @@ function ModelCardSkeleton() {
 };
 
 
-const SketchfabSearchSkeleton: React.FC<SketchfabSearchSkeletonProps> = ({ count = 9 }) => {
+const SketchfabSearchSkeleton: React.FC<SketchfabSearchSkeletonProps> = ({ count = 18 }) => {
     return (
         <div className="w-full h-full">
             <div className="grid grid-cols-3 gap-4 p-2">
