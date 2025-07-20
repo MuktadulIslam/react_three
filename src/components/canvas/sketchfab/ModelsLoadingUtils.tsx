@@ -42,7 +42,7 @@ export default function ModelLoadingUtils({
                         <p className="text-red-400 font-semibold text-xl">No free downloadable models found</p>
                         <p className="text-gray-200 mt-2">Try a different search term or check if there are downloadable models available</p>
                         <p className="text-gray-400 text-sm mt-4">
-                            💡 Try broader search terms like "chair", "car", "building", "animal"
+                            {'💡 Try broader search terms like "chair", "car", "building", "animal" '}
                         </p>
                     </div>
                 </div>
@@ -80,7 +80,7 @@ export default function ModelLoadingUtils({
                         All models loaded ({modelsLength} total)
                     </p>
                     <p className="text-gray-500 text-sm mt-1">
-                        You've reached the end of the search results
+                        {"You've reached the end of the search results"}
                     </p>
                 </div>
             )}
