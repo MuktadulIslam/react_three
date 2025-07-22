@@ -66,7 +66,7 @@ export default function FullscreenWrapper({
     return (
         <div
             ref={containerRef}
-            className={`${className} ${isFullscreen ? 'fixed inset-0 z-[9999]' : ''}`}
+            className={`${className} ${isFullscreen ? 'fixed inset-0 z-[9999]' : 'w-full h-full relative'}`}
         >
             {children}
         </div>
