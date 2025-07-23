@@ -1,11 +1,17 @@
+// src/components/canvas/sidebar/SidebarHeader.tsx (Complete)
 import { Dispatch, SetStateAction, useRef } from "react";
 
 interface SidebarHeaderProps {
     setShowSketchfabSearch: Dispatch<SetStateAction<boolean>>;
+    setShowMeshyGeneration: Dispatch<SetStateAction<boolean>>;
     onFileUpload: (file: File) => void;
 }
 
-export default function SidebarHeader({ setShowSketchfabSearch, onFileUpload }: SidebarHeaderProps) {
+export default function SidebarHeader({
+    setShowSketchfabSearch,
+    setShowMeshyGeneration,
+    onFileUpload
+}: SidebarHeaderProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,25 +59,53 @@ export default function SidebarHeader({ setShowSketchfabSearch, onFileUpload }: 
                         </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-2">
+                    {/* First Row - Upload and Sketchfab */}
+                    <div className="grid grid-cols-2 gap-2 mb-2">
                         {/* File Upload Button */}
                         <button
                             onClick={handleUploadClick}
-                            className="flex-1 py-1.5 text-sm font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-green-600/60 text-green-100 hover:bg-green-500/70 hover:text-white border border-green-500/30 hover:border-green-400/50 hover:shadow-lg hover:shadow-green-900/20"
+                            className="py-1.5 text-sm font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-green-600/60 text-green-100 hover:bg-green-500/70 hover:text-white border border-green-500/30 hover:border-green-400/50 hover:shadow-lg hover:shadow-green-900/20"
                         >
                             <span className="text-base">📁</span>
-                            <span>Upload 3D</span>
+                            <span>Upload</span>
                         </button>
 
                         {/* Sketchfab Search Button */}
                         <button
                             onClick={() => setShowSketchfabSearch(prev => !prev)}
-                            className="flex-1 py-1.5 text-sm font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-gray-700/60 text-gray-300 hover:bg-gray-600/70 hover:text-white border border-gray-600/30 hover:border-gray-500/50"
+                            className="py-1.5 text-sm font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-gray-700/60 text-gray-300 hover:bg-gray-600/70 hover:text-white border border-gray-600/30 hover:border-gray-500/50"
                         >
                             <span className="text-base">🔍</span>
                             <span>Sketchfab</span>
                         </button>
+                    </div>
+
+                    {/* Second Row - AI Generation */}
+                    <div className="grid grid-cols-1 gap-2 mb-3">
+                        {/* Meshy AI Generation Button */}
+                        <button
+                            onClick={() => setShowMeshyGeneration(prev => !prev)}
+                            className="py-2 text-sm font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600/60 via-green-600/60 to-blue-600/60 text-white hover:from-purple-500/70 hover:via-green-500/70 hover:to-blue-500/70 border border-purple-500/30 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-900/20"
+                        >
+                            <span className="text-base">🤖</span>
+                            <span>AI Generate 3D Models</span>
+                        </button>
+                    </div>
+
+                    {/* Feature Highlights */}
+                    <div className="text-xs text-gray-400 space-y-1">
+                        <div className="flex items-center gap-2">
+                            <span className="text-green-400">✨</span>
+                            <span>Upload local GLB/FBX files</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-blue-400">🌐</span>
+                            <span>Search & download from Sketchfab</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-purple-400">🤖</span>
+                            <span>Generate with AI from text/images</span>
+                        </div>
                     </div>
 
                     {/* Hidden File Input */}

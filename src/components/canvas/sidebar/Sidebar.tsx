@@ -1,10 +1,13 @@
+// src/components/canvas/sidebar/Sidebar.tsx (Updated)
 import { useState, useCallback } from "react"
 import SketchfabSearchSideBar from '../sketchfab/SketchfabSearchSideBar';
+import MeshySideBar from '../meshy/MeshySideBar'; // New import
 import SidebarHeader from "./SidebarHeader"
 import SidebarGroupedObjects from "./SidebarGroupedObjects"
 import { DraggableObjectGroup, DraggableObjectData } from './types'
 import Dynamic3DModel from "./Dynamic3DModel"
 import { SketchfabModel } from "../sketchfab/types"
+import { GeneratedModel } from "../meshy/types"; // New import
 import { sidebarStaticObjectGroups } from "./utils"
 
 interface UploadedFile {
@@ -13,8 +16,9 @@ interface UploadedFile {
     url: string;
     fileType: 'glb' | 'fbx';
     uploadDate: Date;
-    source?: 'upload' | 'sketchfab';
+    source?: 'upload' | 'sketchfab' | 'meshy'; // Updated to include meshy
     sketchfabModel?: SketchfabModel;
+    meshyModel?: GeneratedModel; // New field
 }
 
 export default function Sidebar(
@@ -22,6 +26,7 @@ export default function Sidebar(
         { visible: boolean, onDragStart: (component: React.ReactNode) => void }
 ) {
     const [showSketchfabSearch, setShowSketchfabSearch] = useState<boolean>(false);
+    const [showMeshyGeneration, setShowMeshyGeneration] = useState<boolean>(false); // New state
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
 
     const handleFileUpload = useCallback((file: File) => {
@@ -66,13 +71,17 @@ export default function Sidebar(
         id: file.id,
         component: <Dynamic3DModel url={file.url} fileType={file.fileType} />,
         name: file.name,
-        icon: file.source === 'sketchfab' ? '🌐' : (file.fileType === 'glb' ? '📦' : '🗃️'),
+        icon: file.source === 'sketchfab' ? '🌐' :
+            file.source === 'meshy' ? '🤖' :
+                (file.fileType === 'glb' ? '📦' : '🗃️'),
         description: file.source === 'sketchfab'
             ? `From Sketchfab • ${file.fileType.toUpperCase()}`
-            : `Uploaded ${file.fileType.toUpperCase()} model`
+            : file.source === 'meshy'
+                ? `AI Generated • ${file.fileType.toUpperCase()}`
+                : `Uploaded ${file.fileType.toUpperCase()} model`
     }));
 
-    // Separate uploaded and Sketchfab models
+    // Separate uploaded, Sketchfab, and Meshy models
     const regularUploadedObjects = uploadedObjects.filter(obj => {
         const file = uploadedFiles.find(f => f.id === obj.id);
         return file?.source === 'upload';
@@ -83,12 +92,26 @@ export default function Sidebar(
         return file?.source === 'sketchfab';
     });
 
+    const meshyObjects = uploadedObjects.filter(obj => {
+        const file = uploadedFiles.find(f => f.id === obj.id);
+        return file?.source === 'meshy';
+    });
+
     // Get existing Sketchfab model UIDs to prevent duplicates
     const existingSketchfabUids = uploadedFiles
         .filter(file => file.source === 'sketchfab' && file.sketchfabModel)
         .map(file => file.sketchfabModel!.uid);
 
     const objectGroups: DraggableObjectGroup[] = [
+        // Add Meshy models group if there are any
+        ...(meshyObjects.length > 0 ? [{
+            id: 'meshy-models',
+            name: 'AI Generated Models',
+            icon: '🤖',
+            color: 'from-purple-500 via-green-500 to-blue-500',
+            objects: meshyObjects
+        }] : []),
+
         // Add Sketchfab models group if there are any
         ...(sketchfabObjects.length > 0 ? [{
             id: 'sketchfab-models',
@@ -119,10 +142,15 @@ export default function Sidebar(
                 existingModelUids={existingSketchfabUids}
             />
 
+            <MeshySideBar
+                show={showMeshyGeneration}
+                setShow={setShowMeshyGeneration}
+            />
 
             <div className={`absolute left-0 top-0 h-full w-80 ${visible ? '' : '-translate-x-80'} transition-all duration-200 bg-gray-900/90 backdrop-blur-md text-white flex flex-col z-40 shadow-2xl border-r border-gray-700/50 overflow-hidden`}>
                 <SidebarHeader
                     setShowSketchfabSearch={setShowSketchfabSearch}
+                    setShowMeshyGeneration={setShowMeshyGeneration}
                     onFileUpload={handleFileUpload}
                 />
 
