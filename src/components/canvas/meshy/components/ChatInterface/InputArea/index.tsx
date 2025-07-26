@@ -3,9 +3,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Image, X, Settings, } from 'lucide-react';
 import { useMeshyChat } from '../../../context/MeshyChatContext';
-import { useGet3DFromText, useGet3DFromImage, useRefineModel } from '../../../hooks/meshy-hooks';
 import { GenerationType, MeshyTextTo3DRequest, MeshyImageTo3DRequest, MeshyRefineRequest, MeshyModelVersion, } from '../../../types';
 import AdvancedSettings from './AdvancedSettings';
+import { useGet3DFromText } from '../../../hooks/get3DFromText';
+import { useGet3DFromImage } from '../../../hooks/get3DFromImage';
+import { useRefineModel } from '../../../hooks/getRefineModel';
 
 
 export default function InputArea() {

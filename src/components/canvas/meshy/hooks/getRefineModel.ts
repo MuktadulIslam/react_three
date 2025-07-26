@@ -1,12 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
-import { MeshyImageTo3DRequest, Meshy3DObjectResponse } from '../types';
+import { MeshyRefineRequest, Meshy3DObjectResponse } from '../types';
 import axios from 'axios';
 
-export const useGet3DFromImage = () => {
+export const useRefineModel = () => {
     return useMutation({
-        mutationFn: async (data: MeshyImageTo3DRequest): Promise<Meshy3DObjectResponse> => {
+        mutationFn: async (data: MeshyRefineRequest): Promise<Meshy3DObjectResponse> => {
             const { data: responseData } = await axios.post(
-                '/api/meshy/image-to-3d',
+                '/api/meshy/refine',
                 JSON.stringify(data),
                 {
                     headers: {
@@ -17,11 +17,11 @@ export const useGet3DFromImage = () => {
             return responseData;
         },
         onSuccess: (responseData) => {
-            console.log('Image-to-3D generation successful:', responseData);
+            console.log('Model refinement successful:', responseData);
             return responseData;
         },
         onError: (error) => {
-            console.error('Error in image-to-3D generation:', error);
+            console.error('Error in model refinement:', error);
         }
     });
 };

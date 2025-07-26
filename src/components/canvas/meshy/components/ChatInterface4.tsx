@@ -4,11 +4,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Image, Upload, Sparkles, RefreshCw, X, Trash2, ArrowLeftRight, Grid3X3, ChevronDown, Settings, Palette, Zap, Type, Camera, Brush } from 'lucide-react';
 import { useMeshyChat } from '../context/MeshyChatContext';
-import { useGet3DFromText, useGet3DFromImage, useRefineModel } from '../hooks/meshy-hooks';
+import { useRefineModel } from '../hooks/getRefineModel';
 import { GenerationType, MeshyTextTo3DRequest, MeshyImageTo3DRequest, MeshyRefineRequest, ArtStyles, Symmetry } from '../types';
 import ChatMessage from './ChatMessage';
 import ModelComparison from './ModelComparison';
 import ModelGallery from './ModelGallery';
+import { useGet3DFromText } from '../hooks/get3DFromText';
+import { useGet3DFromImage } from '../hooks/get3DFromImage';
 
 interface ChatInterfaceProps {
     activeTab: GenerationType;
