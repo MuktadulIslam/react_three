@@ -1,13 +1,34 @@
-// src/components/canvas/meshy/types.ts
-export type ActiveTab = 'text-to-3d' | 'image-to-3d' | 'refine-model';
+export type GenerationType = 'text-to-3d' | 'image-to-3d' | 'refine';
 export type ArtStyles = 'realistic' | 'sculpture';
 export type Symmetry = 'auto' | 'on' | 'off';
+export type MeshyModelVersion = 'meshy-4' | 'meshy-5';
+
+interface Options {
+    label: string;
+    description: string;
+    icon: string;
+}
+export interface ArtStyleOption extends Options {
+    value: ArtStyles;
+}
+export interface GenerationTypeOption extends Options {
+    value: GenerationType;
+}
+export interface SymmetryOption extends Options {
+    value: Symmetry;
+}
+export interface ModelOption extends Options {
+    value: MeshyModelVersion;
+}
+
+
 
 export interface MeshyTextTo3DRequest {
     prompt: string;
     art_style?: ArtStyles;
     symmetry: Symmetry;
     seed?: number;
+    model_version?: MeshyModelVersion;
 }
 
 export interface MeshyImageTo3DRequest {
@@ -17,19 +38,17 @@ export interface MeshyImageTo3DRequest {
     negative_prompt?: string;
     art_style?: ArtStyles;
     seed?: number;
+    model_version?: MeshyModelVersion;
 }
 
-// export interface MeshyTextureRequest {
-//     model_id: string;
-//     prompt?: string;
-//     art_style?: ArtStyles;
-//     negative_prompt?: string;
-// }
-
-// export interface MeshyRefineRequest {
-//     preview_task_id: string;
-//     texture_resolution?: '1024' | '2048';
-// }
+export interface MeshyRefineRequest {
+    texture_prompt: string;
+    texture_image_url?: string; // Optional base64 image
+    mode: 'refine';
+    moderation?: boolean;
+    ai_model?: string;
+    model_version?: MeshyModelVersion;
+}
 
 export interface Meshy3DObjectResponse {
     id: string;
@@ -56,30 +75,30 @@ export interface Meshy3DObjectResponse {
     ];
 }
 
+// Chat interface types
+export interface ChatMessage {
+    id: string;
+    type: 'user' | 'assistant';
+    content: string;
+    timestamp: Date;
+    generationType?: GenerationType;
+    imageUrl?: string; // For image-to-3d messages
+    modelData?: Meshy3DObjectResponse;
+    isGenerating?: boolean;
+}
 
-// export interface MeshyGenerationState {
-//     taskId: string;
-//     status: MeshyTask['status'];
-//     progress: number;
-//     modelUrls?: MeshyTask['model_urls'];
-//     thumbnailUrl?: string;
-//     prompt?: string;
-//     error?: string;
-//     createdAt: string;
-// }
+export interface ChatSession {
+    id: string;
+    messages: ChatMessage[];
+    currentModel?: Meshy3DObjectResponse;
+    activeGenerationType: GenerationType;
+    createdAt: Date;
+    updatedAt: Date;
+}
 
-// export interface GeneratedModel {
-//     id: string;
-//     name: string;
-//     prompt: string;
-//     thumbnailUrl: string;
-//     modelUrls: {
-//         glb?: string;
-//         fbx?: string;
-//         usdz?: string;
-//         obj?: string;
-//     };
-//     artStyle: string;
-//     createdAt: string;
-//     type: 'text-to-3d' | 'image-to-3d' | 'refined';
-// }
+export interface GenerationContext {
+    currentModel?: Meshy3DObjectResponse;
+    basePrompt?: string;
+    baseImage?: string;
+    generationHistory: ChatMessage[];
+}

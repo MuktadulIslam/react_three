@@ -7,7 +7,6 @@ import SidebarGroupedObjects from "./SidebarGroupedObjects"
 import { DraggableObjectGroup, DraggableObjectData } from './types'
 import Dynamic3DModel from "./Dynamic3DModel"
 import { SketchfabModel } from "../sketchfab/types"
-import { GeneratedModel } from "../meshy/types"; // New import
 import { sidebarStaticObjectGroups } from "./utils"
 
 interface UploadedFile {
@@ -18,7 +17,6 @@ interface UploadedFile {
     uploadDate: Date;
     source?: 'upload' | 'sketchfab' | 'meshy'; // Updated to include meshy
     sketchfabModel?: SketchfabModel;
-    meshyModel?: GeneratedModel; // New field
 }
 
 export default function Sidebar(

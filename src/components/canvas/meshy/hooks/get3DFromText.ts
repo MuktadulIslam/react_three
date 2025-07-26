@@ -7,7 +7,12 @@ export const useGet3DFromText = () => {
         mutationFn: async (data: MeshyTextTo3DRequest): Promise<Meshy3DObjectResponse> => {
             const { data: responseData } = await axios.post(
                 '/api/meshy/text-to-3d',
-                JSON.stringify(data)
+                JSON.stringify(data),
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
             );
             return responseData
         },

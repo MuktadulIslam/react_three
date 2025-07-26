@@ -1,3 +1,4 @@
+// src/components/canvas/meshy/config/index.ts
 export type AImodel = 'meshy-4' | 'meshy-5';
 export type Topology = 'quad' | 'triangle';
 const baseUrl = 'https://api.meshy.ai/v2';
@@ -10,7 +11,8 @@ export const meshyAPIConfig = {
     endpoints: {
         textTo3D: `text-to-3d`,
         textGenerated3D: (taskId: string) => `text-to-3d/${taskId}`,
-        imageTo3D: `${baseUrl}/image-to-3d`,
+        imageTo3D: `image-to-3d`, // Updated endpoint
+        imageGenerated3D: (taskId: string) => `image-to-3d/${taskId}`, // Added for consistency
     },
     timeout: 30000, // 30 seconds
     baseUrl: baseUrl,
