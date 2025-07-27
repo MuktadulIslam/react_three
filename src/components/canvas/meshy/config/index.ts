@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/config/index.ts
 export type AImodel = 'meshy-4' | 'meshy-5';
 export type Topology = 'quad' | 'triangle';
 const baseUrl = 'https://api.meshy.ai/v2';

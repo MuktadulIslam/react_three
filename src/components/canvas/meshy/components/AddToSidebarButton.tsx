@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/components/AddToSidebarButton.tsx
 "use client";
 
 import React, { useState } from 'react';

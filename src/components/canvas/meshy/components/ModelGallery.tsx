@@ -1,10 +1,9 @@
-// src/components/canvas/meshy/components/ModelGallery.tsx
 "use client";
 
 import React, { useState } from 'react';
 import { Grid3X3, X, Download, Eye, ArrowLeftRight } from 'lucide-react';
 import { Meshy3DObjectResponse } from '../types';
-import InlineModelViewer from './InlineModelViewer';
+import { ModelViewer } from './ModelViewer';
 
 interface ModelGalleryProps {
     models: Meshy3DObjectResponse[];
@@ -15,7 +14,6 @@ interface ModelGalleryProps {
 
 export default function ModelGallery({ models, onClose, onSelectModel, onCompare }: ModelGalleryProps) {
     const [selectedModels, setSelectedModels] = useState<Set<string>>(new Set());
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
     const handleModelSelect = (modelId: string) => {
         const newSelected = new Set(selectedModels);
@@ -114,30 +112,25 @@ export default function ModelGallery({ models, onClose, onSelectModel, onCompare
 
             {/* Gallery Content */}
             <div className="flex-1 overflow-auto p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                     {models.map((model, index) => (
                         <div
                             key={model.id}
                             className={`bg-gray-800 rounded-lg border transition-all duration-200 ${selectedModels.has(model.id)
-                                    ? 'border-blue-500 bg-blue-500/10'
-                                    : 'border-gray-600 hover:border-gray-500'
+                                ? 'border-blue-500 bg-blue-500/10'
+                                : 'border-gray-600 hover:border-gray-500'
                                 }`}
                         >
                             {/* Model Viewer */}
                             <div className="relative">
-                                <div className="h-48">
-                                    <InlineModelViewer
-                                        modelData={model}
-                                        isExpanded={false}
-                                    />
-                                </div>
+                                <ModelViewer modelUrl={model.model_urls?.glb} hideHeader={true} />
 
                                 {/* Selection Checkbox */}
                                 <button
                                     onClick={() => handleModelSelect(model.id)}
                                     className={`absolute top-2 left-2 w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${selectedModels.has(model.id)
-                                            ? 'bg-blue-500 border-blue-500 text-white'
-                                            : 'bg-black/50 border-gray-400 hover:border-blue-400'
+                                        ? 'bg-blue-500 border-blue-500 text-white'
+                                        : 'bg-black/50 border-gray-400 hover:border-blue-400'
                                         }`}
                                 >
                                     {selectedModels.has(model.id) && '✓'}

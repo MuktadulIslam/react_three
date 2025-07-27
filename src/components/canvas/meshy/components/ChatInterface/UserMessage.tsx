@@ -1,9 +1,8 @@
-// src/components/canvas/meshy/components/UserMessage.tsx
 'use client';
 
 import React from 'react';
 import { User, Sparkles, Eye, RefreshCw } from 'lucide-react';
-import { ChatMessage as ChatMessageType } from '../types';
+import { ChatMessage as ChatMessageType } from '../../types';
 
 interface UserMessageProps {
     message: ChatMessageType;

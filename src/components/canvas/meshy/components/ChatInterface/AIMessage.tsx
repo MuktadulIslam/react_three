@@ -1,15 +1,13 @@
-// src/components/canvas/meshy/components/AIMessage.tsx
 'use client';
 
 import { Bot, Download } from 'lucide-react';
-import { ChatMessage as ChatMessageType, Meshy3DObjectResponse } from '../types';
-import AddToSidebarButton from './AddToSidebarButton';
-import { ModelViewer } from './ModelViewer';
+import { ChatMessage as ChatMessageType, Meshy3DObjectResponse } from '../../types';
+import AddToSidebarButton from '../AddToSidebarButton';
+import { ModelViewer } from '../ModelViewer';
+import { useMeshyChat } from '../../context/MeshyChatContext';
 
 interface AIMessageProps {
     message: ChatMessageType;
-    currentModel: Meshy3DObjectResponse | null;
-    setCurrentModel: (model: Meshy3DObjectResponse | null) => void;
     onAddToSidebar?: (modelData: {
         id: string;
         name: string;
@@ -19,12 +17,8 @@ interface AIMessageProps {
     }) => void;
 }
 
-export default function AIMessage({
-    message,
-    currentModel,
-    setCurrentModel,
-    onAddToSidebar
-}: AIMessageProps) {
+export default function AIMessage({ message, onAddToSidebar }: AIMessageProps) {
+    const { current3DModel } = useMeshyChat();
 
     const handleDownload = (model: Meshy3DObjectResponse, format: 'glb' | 'fbx' | 'obj') => {
         const url = model.model_urls?.[format];
@@ -55,7 +49,7 @@ export default function AIMessage({
 
             {/* Message Content */}
             <div className="flex-1 max-w-[80%] text-left">
-                <div className={`w-full inline-block p-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white ${message.isGenerating ? 'animate-pulse' : ''
+                <div className={`w-full inline-block p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white ${message.isGenerating ? 'animate-pulse' : ''
                     }`}>
 
                     {/* Message Text */}
@@ -75,7 +69,7 @@ export default function AIMessage({
                         <div className="mt-1 space-y-3 w-full">
                             <ModelViewer
                                 modelUrl={message.modelData.model_urls?.glb ?? ''}
-                                modelData={currentModel || undefined}
+                                modelData={current3DModel || undefined}
                                 showControls={true}
                             />
 

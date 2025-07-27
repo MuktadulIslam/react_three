@@ -1,10 +1,8 @@
-// src/components/canvas/meshy/components/ModelComparison.tsx
 "use client";
 
 import React, { useState } from 'react';
 import { X, ArrowLeftRight, Download } from 'lucide-react';
 import { Meshy3DObjectResponse } from '../types';
-import InlineModelViewer from './InlineModelViewer';
 import { ModelViewer } from './ModelViewer';
 
 interface ModelComparisonProps {

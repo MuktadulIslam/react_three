@@ -77,7 +77,7 @@ export default function InputArea() {
             currentInput.trim();
 
         // Add user message
-        const userMessageId = addMessage({
+        addMessage({
             type: 'user',
             content: userMessageContent,
             generationType: currentGenerationType.value,

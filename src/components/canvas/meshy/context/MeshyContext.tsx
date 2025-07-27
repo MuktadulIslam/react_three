@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/context/MeshyContext.tsx
 'use client';
 
 import React, { createContext, useContext, ReactNode } from 'react';

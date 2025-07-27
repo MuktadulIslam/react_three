@@ -3,10 +3,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { RefreshCw, Trash2, ArrowLeftRight, Grid3X3 } from 'lucide-react';
 import { useMeshyChat } from '../../context/MeshyChatContext';
-import ChatMessage from '../ChatMessage';
 import ModelComparison from '../ModelComparison';
 import ModelGallery from '../ModelGallery';
 import InputArea from './InputArea';
+import UserMessage from './UserMessage';
+import AIMessage from './AIMessage';
 
 interface ChatInterfaceProps {
     onAddModelToSidebar?: (modelData: {
@@ -19,7 +20,7 @@ interface ChatInterfaceProps {
 }
 
 export default function ChatInterface({ onAddModelToSidebar }: ChatInterfaceProps) {
-    const { messages, startNewSession, clearSession, current3DModel, setCurrent3DModel, currentGenerationType } = useMeshyChat();
+    const { messages, startNewSession, clearSession, setCurrent3DModel, currentGenerationType } = useMeshyChat();
     const [showComparison, setShowComparison] = useState(false);
     const [showGallery, setShowGallery] = useState(false);
 
@@ -90,15 +91,14 @@ export default function ChatInterface({ onAddModelToSidebar }: ChatInterfaceProp
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                {messages.map((message) => (
-                    <ChatMessage
-                        key={message.id}
-                        message={message}
-                        currentModel={current3DModel}
-                        setCurrentModel={setCurrent3DModel}
-                        onAddToSidebar={onAddModelToSidebar}
-                    />
-                ))}
+                {messages.map((message) =>
+                    message.type == 'user' ? (<UserMessage key={message.id} message={message} />) : (
+                        <AIMessage
+                            key={message.id}
+                            message={message}
+                            onAddToSidebar={onAddModelToSidebar}
+                        />
+                    ))}
                 <div ref={messagesEndRef} />
             </div>
 

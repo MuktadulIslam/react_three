@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/context/MeshyChatContext.tsx
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
