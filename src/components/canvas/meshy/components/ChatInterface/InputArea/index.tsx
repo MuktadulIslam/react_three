@@ -16,6 +16,7 @@ export default function InputArea() {
         addMessage,
         updateMessage,
         currentModel,
+        current3DModel,
         currentInput,
         setCurrentInput,
         currentImage,
@@ -47,19 +48,6 @@ export default function InputArea() {
     // Initialize session when component mounts or tab changes
 
 
-    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const result = e.target?.result as string;
-                setCurrentImage(result);
-                setImagePreview(result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
     const removeImage = () => {
         setCurrentImage(null);
         setImagePreview(null);
@@ -68,9 +56,42 @@ export default function InputArea() {
         }
     };
 
+    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file && file.type.startsWith('image/')) {
+            // Check file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Image file size must be less than 10MB');
+                return;
+            }
+
+            // Check file type
+            const supportedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (!supportedTypes.includes(file.type)) {
+                alert('Please upload a JPG, JPEG or PNG image');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const result = e.target?.result as string;
+                setCurrentImage(result);
+                setImagePreview(result);
+            };
+            reader.onerror = (error) => {
+                console.error('Error reading file:', error);
+                alert('Error reading the image file');
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert('Please select a valid image file');
+        }
+    };
+
     const handleSubmit = async () => {
         if (!currentInput.trim() && !currentImage) return;
         if (isGenerating) return;
+        if (currentGenerationType.value === 'image-to-3d') { removeImage(); }
 
         const userMessageContent = currentGenerationType.value === 'image-to-3d' && currentImage ?
             `${currentInput.trim() || 'Generate 3D model from uploaded image'}` :
@@ -110,19 +131,17 @@ export default function InputArea() {
                     break;
 
                 case 'image-to-3d':
-                    if (!currentImage) {
-                        throw new Error('Please upload an image first');
-                    }
                     const imageRequest: MeshyImageTo3DRequest = {
-                        image_data: currentImage,
+                        image_data: currentImage ?? '',
                         symmetry: currentSymmetry.value,
-                        model_version: currentModel.value
+                        model_version: currentModel.value,
+                        texture_prompt: currentInput.trim(),
                     };
                     result = await imageTo3DMutation.mutateAsync(imageRequest);
                     break;
 
                 case 'refine':
-                    if (!currentModel) {
+                    if (!current3DModel) {
                         throw new Error('Please generate a model first before refining');
                     }
                     const refineRequest: MeshyRefineRequest = {
@@ -137,6 +156,7 @@ export default function InputArea() {
                 default:
                     throw new Error('Invalid generation type');
             }
+
             // Update current model
             setCurrent3DModel(result);
 
@@ -155,11 +175,9 @@ export default function InputArea() {
             });
         } finally {
             setIsGenerating(false);
-            if (currentGenerationType.value === 'image-to-3d') {
-                removeImage();
-            }
         }
     };
+
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -264,7 +282,7 @@ export default function InputArea() {
             <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/jpg,image/png"
                 onChange={handleImageUpload}
                 className="hidden"
             />

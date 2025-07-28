@@ -1,3 +1,4 @@
+// src/components/canvas/meshy/types.ts
 export type GenerationType = 'text-to-3d' | 'image-to-3d' | 'refine';
 export type ArtStyles = 'realistic' | 'sculpture';
 export type Symmetry = 'auto' | 'on' | 'off';
@@ -22,20 +23,19 @@ export interface ModelOption extends Options {
     value: MeshyModelVersion;
 }
 
-
-
 export interface MeshyTextTo3DRequest {
     prompt: string;
-    art_style?: ArtStyles;
+    art_style: ArtStyles;
     symmetry: Symmetry;
     seed?: number;
-    model_version?: MeshyModelVersion;
+    model_version: MeshyModelVersion;
 }
 
 export interface MeshyImageTo3DRequest {
-    model_version?: MeshyModelVersion;
+    image_data: string; // Base64 data URI
+    model_version: MeshyModelVersion;
     symmetry: Symmetry;
-    image_data: string;
+    texture_prompt: string;
 }
 
 export interface MeshyRefineRequest {
@@ -47,29 +47,33 @@ export interface MeshyRefineRequest {
     model_version?: MeshyModelVersion;
 }
 
+// Updated response type to match Meshy API
 export interface Meshy3DObjectResponse {
     id: string;
     model_urls?: {
-        glb: string;
-        fbx: string;
+        glb?: string;
+        fbx?: string;
         usdz?: string;
         obj?: string;
         mtl?: string;
     };
     thumbnail_url?: string;
+    texture_prompt?: string;
     progress?: number;
+    status: 'PENDING' | 'IN_PROGRESS' | 'SUCCEEDED' | 'FAILED' | 'CANCELED';
     started_at?: number;
     created_at?: number;
     expires_at?: number;
     finished_at?: number;
-    texture_urls: [
-        {
-            base_color: string;
-            metallic?: string;
-            normal?: string;
-            roughness?: string;
-        }
-    ];
+    texture_urls?: Array<{
+        base_color?: string;
+        metallic?: string;
+        normal?: string;
+        roughness?: string;
+    }>;
+    task_error?: {
+        message: string;
+    } | null;
 }
 
 // Chat interface types

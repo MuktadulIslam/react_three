@@ -1,6 +1,8 @@
+// src/components/canvas/meshy/config/index.ts
 import { MeshyModelVersion, Topology } from "../types";
 
-const baseUrl = 'https://api.meshy.ai/v2';
+// Updated to use the correct API base URL
+const baseUrl = 'https://api.meshy.ai/openapi';
 
 export const meshyAPIConfig = {
     apiKey: process.env.MESHY_API_KEY || 'msy_dummy_api_key_for_test_mode_12345678',
@@ -8,12 +10,18 @@ export const meshyAPIConfig = {
     topology: 'triangle' as Topology,
     target_polycount: 30000,
     endpoints: {
-        textTo3D: `text-to-3d`,
-        textGenerated3D: (taskId: string) => `text-to-3d/${taskId}`,
-        imageTo3D: `image-to-3d`, // Updated endpoint
-        imageGenerated3D: (taskId: string) => `image-to-3d/${taskId}`, // Added for consistency
+        // Text to 3D uses v2
+        textTo3D: `v2/text-to-3d`,
+        textGenerated3D: (taskId: string) => `v2/text-to-3d/${taskId}`,
+
+        // Image to 3D uses v1
+        imageTo3D: `v1/image-to-3d`,
+        imageGenerated3D: (taskId: string) => `v1/image-to-3d/${taskId}`,
+
+        // Refine uses v2 text-to-3d endpoint
+        refine: `v2/text-to-3d`,
     },
-    timeout: 30000, // 30 seconds
+    timeout: 30000, // 30 seconds for initial requests
     baseUrl: baseUrl,
 };
 

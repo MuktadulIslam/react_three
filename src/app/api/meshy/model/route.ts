@@ -27,8 +27,6 @@ export async function GET(request: NextRequest) {
         // Get the file data
         const fileData = await response.arrayBuffer();
 
-        console.log("FileDate: ", fileData)
-
         // Return the file with proper CORS headers
         return new NextResponse(fileData, {
             status: 200,
