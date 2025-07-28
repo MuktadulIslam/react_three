@@ -1,10 +1,10 @@
-export type AImodel = 'meshy-4' | 'meshy-5';
-export type Topology = 'quad' | 'triangle';
+import { MeshyModelVersion, Topology } from "../types";
+
 const baseUrl = 'https://api.meshy.ai/v2';
 
 export const meshyAPIConfig = {
     apiKey: process.env.MESHY_API_KEY || 'msy_dummy_api_key_for_test_mode_12345678',
-    aimodel: 'meshy-4' as AImodel,
+    aimodel: 'meshy-4' as MeshyModelVersion,
     topology: 'triangle' as Topology,
     target_polycount: 30000,
     endpoints: {

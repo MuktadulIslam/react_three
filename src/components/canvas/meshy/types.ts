@@ -2,6 +2,7 @@ export type GenerationType = 'text-to-3d' | 'image-to-3d' | 'refine';
 export type ArtStyles = 'realistic' | 'sculpture';
 export type Symmetry = 'auto' | 'on' | 'off';
 export type MeshyModelVersion = 'meshy-4' | 'meshy-5';
+export type Topology = 'quad' | 'triangle';
 
 interface Options {
     label: string;
@@ -32,13 +33,9 @@ export interface MeshyTextTo3DRequest {
 }
 
 export interface MeshyImageTo3DRequest {
-    mode: 'preview' | 'refine';
-    image_url: string;
-    prompt?: string;
-    negative_prompt?: string;
-    art_style?: ArtStyles;
-    seed?: number;
     model_version?: MeshyModelVersion;
+    symmetry: Symmetry;
+    image_data: string;
 }
 
 export interface MeshyRefineRequest {

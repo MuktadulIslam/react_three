@@ -20,7 +20,7 @@ export default function AdvancedSettings({ showSettings }: AdvancedSettingsProps
     const symmetryDropdownRef = useRef<HTMLDivElement>(null);
     const generationTypeDropdownRef = useRef<HTMLDivElement>(null);
 
-    const { currentModel, currentArtStyle, currentSymmetry } = useMeshyChat();
+    const { currentModel, currentArtStyle, currentSymmetry, currentGenerationType } = useMeshyChat();
 
 
     useEffect(() => {
@@ -48,7 +48,9 @@ export default function AdvancedSettings({ showSettings }: AdvancedSettingsProps
             {showSettings ? (
                 <div className="flex-1 flex items-center gap-3 flex-wrap text-gray-200">
                     <ModelSelection ref={modelDropdownRef} setShow={setShowModelDropdown} show={showModelDropdown} />
-                    <ArtStyleSelection ref={artStyleDropdownRef} setShow={setShowArtStyleDropdown} show={showArtStyleDropdown} />
+                    {currentGenerationType.value == 'text-to-3d' &&
+                        <ArtStyleSelection ref={artStyleDropdownRef} setShow={setShowArtStyleDropdown} show={showArtStyleDropdown} />
+                    }
                     <SymmetrySelection ref={symmetryDropdownRef} setShow={setShowSymmetryDropdown} show={showSymmetryDropdown} />
                 </div>
             ) : (
@@ -57,11 +59,15 @@ export default function AdvancedSettings({ showSettings }: AdvancedSettingsProps
                         <span>{currentModel.icon}</span>
                         {currentModel.label}
                     </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                        <span>{currentArtStyle.icon}</span>
-                        {currentArtStyle.label}
-                    </span>
+                    {currentGenerationType.value == 'text-to-3d' &&
+                        <>
+                            <span>•</span>
+                            <span className="flex items-center gap-1">
+                                <span>{currentArtStyle.icon}</span>
+                                {currentArtStyle.label}
+                            </span>
+                        </>
+                    }
                     <span>•</span>
                     <span className="flex items-center gap-1">
                         <span>{currentSymmetry.icon}</span>

@@ -11,9 +11,10 @@ export async function POST(request: NextRequest) {
             art_style: body.art_style || 'realistic',
             symmetry: body.symmetry || 'auto',
             seed: body.seed || Math.floor(Math.random() * 1000000),
+            ai_model: body.model_version || meshyAPIConfig.aimodel,
             mode: 'preview',
             should_remesh: true,
-            ai_model: meshyAPIConfig.aimodel,
+            topology: meshyAPIConfig.topology
         };
 
         const response = await meshyAxiosInstance.post(meshyAPIConfig.endpoints.textTo3D, payload);

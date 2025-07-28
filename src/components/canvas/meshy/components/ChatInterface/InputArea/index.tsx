@@ -114,10 +114,8 @@ export default function InputArea() {
                         throw new Error('Please upload an image first');
                     }
                     const imageRequest: MeshyImageTo3DRequest = {
-                        mode: 'preview',
-                        image_url: currentImage,
-                        prompt: currentInput.trim(),
-                        art_style: currentArtStyle.value,
+                        image_data: currentImage,
+                        symmetry: currentSymmetry.value,
                         model_version: currentModel.value
                     };
                     result = await imageTo3DMutation.mutateAsync(imageRequest);
@@ -215,6 +213,7 @@ export default function InputArea() {
                     placeholder={getPlaceholder()}
                     className="w-full flex-1 px-3 py-3 text-white placeholder-gray-400 focus:outline-none resize-none"
                     disabled={isGenerating}
+                    maxLength={600}
                 />
 
                 <div className="px-2 py-1.5 grow-0 flex items-center gap-2 text-xs text-gray-400 border-t border-white/10">
