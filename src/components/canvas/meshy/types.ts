@@ -32,7 +32,7 @@ export interface MeshyTextTo3DRequest {
 }
 
 export interface MeshyImageTo3DRequest {
-    image_data: string; // Base64 data URI
+    image_data: string | string[]; // Now supports multiple images
     model_version: MeshyModelVersion;
     symmetry: Symmetry;
     texture_prompt: string;
@@ -40,7 +40,7 @@ export interface MeshyImageTo3DRequest {
 
 export interface MeshyRefineRequest {
     texture_prompt: string;
-    texture_image_url?: string; // Optional base64 image
+    texture_image_url?: string | string[]; // Support multiple images for refinement
     mode: 'refine';
     moderation?: boolean;
     ai_model?: string;
@@ -83,7 +83,8 @@ export interface ChatMessage {
     content: string;
     timestamp: Date;
     generationType?: GenerationType;
-    imageUrl?: string; // For image-to-3d messages
+    imageUrl?: string; // For backward compatibility
+    imageUrls?: string[]; // New: Support multiple images
     modelData?: Meshy3DObjectResponse;
     isGenerating?: boolean;
 }
@@ -101,5 +102,6 @@ export interface GenerationContext {
     currentModel?: Meshy3DObjectResponse;
     basePrompt?: string;
     baseImage?: string;
+    baseImages?: string[]; // New: Support multiple base images
     generationHistory: ChatMessage[];
 }

@@ -6,16 +6,52 @@ import meshyAxiosInstance from '../axios-config';
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        if (!body.image_data) {
+
+        // Handle both single image and multiple images
+        const imageData = body.image_data;
+        if (!imageData) {
             return NextResponse.json(
                 { error: 'image_data is required' },
                 { status: 400 }
             );
         }
 
+        // Validate image data format
+        const images = Array.isArray(imageData) ? imageData : [imageData];
+
+        // Validate each image
+        for (let i = 0; i < images.length; i++) {
+            if (!images[i] || typeof images[i] !== 'string') {
+                return NextResponse.json(
+                    { error: `Invalid image data at index ${i}` },
+                    { status: 400 }
+                );
+            }
+
+            if (!images[i].startsWith('data:image/')) {
+                return NextResponse.json(
+                    { error: `Image ${i + 1} must be a valid data URI (data:image/...)` },
+                    { status: 400 }
+                );
+            }
+        }
+
+        // Check image count limit
+        if (images.length > 4) {
+            return NextResponse.json(
+                { error: 'Maximum 4 images allowed' },
+                { status: 400 }
+            );
+        }
+
+        // Prepare the payload - Meshy API currently only supports single image
+        // For multiple images, we'll use the first one as primary for now
+        // Future enhancement: implement proper multi-image handling when API supports it
+        const primaryImage = images[0];
+
         const payload = {
-            image_url: body.image_data, // This should be a base64 data URI or URL
-            ai_model: body.model_version || meshyAPIConfig.aimodel,
+            image_url: primaryImage, // Use the first image as primary
+            ai_model: images.length > 1 ? 'meshy-5' : (body.model_version || meshyAPIConfig.aimodel),
             texture_prompt: body.texture_prompt || '',
             symmetry_mode: body.symmetry || 'auto',
             should_remesh: true,
@@ -23,33 +59,89 @@ export async function POST(request: NextRequest) {
             enable_pbr: true,
         };
 
+        // Add additional context for multiple images in the texture prompt
+        if (images.length > 1) {
+            const enhancedPrompt = body.texture_prompt ?
+                `${body.texture_prompt} (Generated from ${images.length} reference images)` :
+                `3D model generated from ${images.length} reference images`;
+            payload.texture_prompt = enhancedPrompt;
+        }
+
+        console.log('Sending payload to Meshy API:', {
+            ...payload,
+            image_url: '[IMAGE_DATA]',
+            ai_model: payload.ai_model,
+            images_count: images.length
+        });
+
         const response = await meshyAxiosInstance.post(meshyAPIConfig.endpoints.imageTo3D, payload);
         const taskId = response.data.result;
 
-        // Poll for completion (simple polling approach 5 times in 5s interval)
+        if (!taskId) {
+            throw new Error('No task ID received from Meshy API');
+        }
+
+        // Poll for completion
         let attempts = 0;
-        const maxAttempts = 5;
-        const pollInterval = 5000;
+        const maxAttempts = 5; // Standard attempts regardless of image count
+        const pollInterval = 5000; // Standard 5 second interval
+
+        console.log(`Starting polling for task ${taskId} (${images.length} images processed)`);
 
         while (attempts < maxAttempts) {
             await new Promise(resolve => setTimeout(resolve, pollInterval));
             attempts++;
 
-            const statusResponse = await meshyAxiosInstance.get(meshyAPIConfig.endpoints.imageGenerated3D(taskId));
-            if (statusResponse.data.status === 'SUCCEEDED') {
-                return NextResponse.json(statusResponse.data);
+            try {
+                const statusResponse = await meshyAxiosInstance.get(meshyAPIConfig.endpoints.imageGenerated3D(taskId));
+                const status = statusResponse.data.status;
+
+                console.log(`Attempt ${attempts}/${maxAttempts}: Task ${taskId} status: ${status}`);
+
+                if (status === 'SUCCEEDED') {
+                    console.log('Image-to-3D generation completed successfully');
+                    return NextResponse.json(statusResponse.data);
+                } else if (status === 'FAILED') {
+                    const errorMessage = statusResponse.data.task_error?.message || 'Generation failed';
+                    console.error('Generation failed:', errorMessage);
+                    throw new Error(`Generation failed: ${errorMessage}`);
+                }
+                // Continue polling for PENDING or IN_PROGRESS status
+            } catch (pollError) {
+                console.error(`Polling attempt ${attempts} failed:`, pollError);
+                if (attempts === maxAttempts) {
+                    throw pollError;
+                }
+                // Continue polling on error unless it's the last attempt
             }
         }
 
+        // If we reach here, polling timed out
+        console.error('Polling timed out for task:', taskId);
         return NextResponse.json(
-            { error: 'Image-to-3D generation failed' },
-            { status: 500 }
+            {
+                error: 'Image-to-3D generation timed out',
+                details: `Task ${taskId} did not complete within ${maxAttempts * pollInterval / 1000} seconds. Processing ${images.length} image(s).`,
+                taskId: taskId
+            },
+            { status: 408 }
         );
 
     } catch (error) {
         console.error('Image-to-3D API error:', error);
+
+        if (error instanceof Error) {
+            return NextResponse.json(
+                {
+                    error: 'Failed to generate 3D model from image(s)',
+                    details: error.message
+                },
+                { status: 500 }
+            );
+        }
+
         return NextResponse.json(
-            { error: 'Failed to generate 3D model from the image' },
+            { error: 'Failed to generate 3D model from image(s)' },
             { status: 500 }
         );
     }

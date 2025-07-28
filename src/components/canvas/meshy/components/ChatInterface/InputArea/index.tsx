@@ -1,14 +1,14 @@
+// src/components/canvas/meshy/components/ChatInterface/InputArea/index.tsx
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Image, X, Settings, } from 'lucide-react';
+import { Send, Image, X, Settings, AlertCircle } from 'lucide-react';
 import { useMeshyChat } from '../../../context/MeshyChatContext';
 import { GenerationType, MeshyTextTo3DRequest, MeshyImageTo3DRequest, MeshyRefineRequest, MeshyModelVersion, } from '../../../types';
 import AdvancedSettings from './AdvancedSettings';
 import { useGet3DFromText } from '../../../hooks/get3DFromText';
 import { useGet3DFromImage } from '../../../hooks/get3DFromImage';
 import { useRefineModel } from '../../../hooks/getRefineModel';
-
 
 export default function InputArea() {
     const {
@@ -19,8 +19,10 @@ export default function InputArea() {
         current3DModel,
         currentInput,
         setCurrentInput,
-        currentImage,
-        setCurrentImage,
+        currentImages,
+        addCurrentImage,
+        removeCurrentImage,
+        clearCurrentImages,
         isGenerating,
         setIsGenerating,
         currentGenerationType,
@@ -29,7 +31,6 @@ export default function InputArea() {
         setCurrent3DModel
     } = useMeshyChat();
 
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -45,70 +46,88 @@ export default function InputArea() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    // Initialize session when component mounts or tab changes
-
-
-    const removeImage = () => {
-        setCurrentImage(null);
-        setImagePreview(null);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
-    };
-
-    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file && file.type.startsWith('image/')) {
+    const processImageFile = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
             // Check file size (max 10MB)
             if (file.size > 10 * 1024 * 1024) {
-                alert('Image file size must be less than 10MB');
+                reject(new Error('Image file size must be less than 10MB'));
                 return;
             }
 
             // Check file type
-            const supportedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            const supportedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
             if (!supportedTypes.includes(file.type)) {
-                alert('Please upload a JPG, JPEG or PNG image');
+                reject(new Error('Please upload a JPG, JPEG, PNG, or WebP image'));
                 return;
             }
 
             const reader = new FileReader();
             reader.onload = (e) => {
                 const result = e.target?.result as string;
-                setCurrentImage(result);
-                setImagePreview(result);
+                resolve(result);
             };
-            reader.onerror = (error) => {
-                console.error('Error reading file:', error);
-                alert('Error reading the image file');
+            reader.onerror = () => {
+                reject(new Error('Error reading the image file'));
             };
             reader.readAsDataURL(file);
-        } else {
-            alert('Please select a valid image file');
+        });
+    };
+
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(event.target.files || []);
+
+        if (files.length === 0) return;
+
+        // Check if adding these files would exceed the limit
+        if (currentImages.length + files.length > 4) {
+            const remainingSlots = 4 - currentImages.length;
+            if (remainingSlots === 0) {
+                alert('You can upload a maximum of 4 images. Please remove some images first.');
+                return;
+            } else {
+                alert(`You can only add ${remainingSlots} more image(s). Only the first ${remainingSlots} will be uploaded.`);
+            }
+        }
+
+        const filesToProcess = files.slice(0, 4 - currentImages.length);
+
+        try {
+            for (const file of filesToProcess) {
+                const dataUri = await processImageFile(file);
+                addCurrentImage(dataUri);
+            }
+        } catch (error) {
+            console.error('Error processing images:', error);
+            alert(error instanceof Error ? error.message : 'Error processing images');
+        }
+
+        // Reset input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
         }
     };
 
     const handleSubmit = async () => {
-        if (!currentInput.trim() && !currentImage) return;
+        if (!currentInput.trim() && currentImages.length === 0) return;
         if (isGenerating) return;
-        if (currentGenerationType.value === 'image-to-3d') { removeImage(); }
 
-        const userMessageContent = currentGenerationType.value === 'image-to-3d' && currentImage ?
-            `${currentInput.trim() || 'Generate 3D model from uploaded image'}` :
+        const userMessageContent = currentGenerationType.value === 'image-to-3d' && currentImages.length > 0 ?
+            `${currentInput.trim() || 'Generate 3D model from uploaded images'}` :
             currentInput.trim();
 
-        // Add user message
+        // Add user message with multiple images
         addMessage({
             type: 'user',
             content: userMessageContent,
             generationType: currentGenerationType.value,
-            imageUrl: currentImage || undefined
+            imageUrls: currentImages.length > 0 ? currentImages : undefined,
+            imageUrl: currentImages.length > 0 ? currentImages[0] : undefined // Backward compatibility
         });
 
         // Add assistant thinking message
         const assistantMessageId = addMessage({
             type: 'assistant',
-            content: `Generating your 3D model using ${currentModel.value} (${currentArtStyle.value}, ${currentSymmetry.value})...`,
+            content: `Generating your 3D model using ${currentModel.value} (${currentArtStyle.value}, ${currentSymmetry.value})${currentImages.length > 1 ? ` with ${currentImages.length} images` : ''}...`,
             isGenerating: true
         });
 
@@ -132,7 +151,7 @@ export default function InputArea() {
 
                 case 'image-to-3d':
                     const imageRequest: MeshyImageTo3DRequest = {
-                        image_data: currentImage ?? '',
+                        image_data: currentImages.length > 1 ? currentImages : currentImages[0] || '',
                         symmetry: currentSymmetry.value,
                         model_version: currentModel.value,
                         texture_prompt: currentInput.trim(),
@@ -146,7 +165,7 @@ export default function InputArea() {
                     }
                     const refineRequest: MeshyRefineRequest = {
                         texture_prompt: currentInput.trim(),
-                        texture_image_url: currentImage || undefined,
+                        texture_image_url: currentImages.length > 1 ? currentImages : currentImages[0],
                         mode: 'refine',
                         model_version: currentModel.value
                     };
@@ -162,7 +181,7 @@ export default function InputArea() {
 
             // Update assistant message with success
             updateMessage(assistantMessageId ?? '', {
-                content: getSuccessMessage(currentGenerationType.value, currentModel.value),
+                content: getSuccessMessage(currentGenerationType.value, currentModel.value, currentImages.length),
                 isGenerating: false,
                 modelData: result
             });
@@ -175,9 +194,9 @@ export default function InputArea() {
             });
         } finally {
             setIsGenerating(false);
+            clearCurrentImages();
         }
     };
-
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -193,7 +212,9 @@ export default function InputArea() {
                     "Describe changes to your model or create something new..." :
                     "Describe the 3D model you want to create...";
             case 'image-to-3d':
-                return "Describe what you want to generate from the image (optional)...";
+                return currentImages.length > 0 ?
+                    `Describe what you want to generate from ${currentImages.length} image(s) (optional)...` :
+                    "Upload images and describe what you want to generate (optional)...";
             case 'refine':
                 return currentModel ?
                     "Describe the textures or refinements you want..." :
@@ -205,21 +226,46 @@ export default function InputArea() {
 
     return (
         <div className="w-full h-auto p-2 border-t border-white/10">
-            {imagePreview && currentGenerationType.value === 'image-to-3d' && (
-                <div className="py-1">
-                    <div className="relative inline-block">
-                        <img
-                            src={imagePreview}
-                            alt="Upload preview"
-                            className="w-16 h-16 object-cover rounded-lg border border-white/20"
-                        />
-                        <button
-                            onClick={removeImage}
-                            className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs"
-                        >
-                            <X size={10} />
-                        </button>
+            {/* Multi-Image Preview */}
+            {currentImages.length > 0 && (currentGenerationType.value === 'image-to-3d' || currentGenerationType.value === 'refine') && (
+                <div className="py-2">
+                    <div className="flex flex-wrap gap-2">
+                        {currentImages.map((image, index) => (
+                            <div key={index} className="relative inline-block">
+                                <img
+                                    src={image}
+                                    alt={`Upload preview ${index + 1}`}
+                                    className="w-16 h-16 object-cover rounded-lg border border-white/20"
+                                />
+                                <button
+                                    onClick={() => removeCurrentImage(index)}
+                                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs"
+                                >
+                                    <X size={10} />
+                                </button>
+                            </div>
+                        ))}
+
+                        {/* Add more images button */}
+                        {currentImages.length < 4 && (
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-16 h-16 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-colors"
+                            >
+                                <Image size={20} />
+                            </button>
+                        )}
                     </div>
+
+                    {/* Multi-image info */}
+                    {currentImages.length > 1 && (
+                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-300">
+                            <AlertCircle size={14} />
+                            <span>
+                                {currentImages.length} images selected - using advanced Meshy-5 model for better multi-image processing
+                            </span>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -241,7 +287,8 @@ export default function InputArea() {
                             <button
                                 onClick={() => fileInputRef.current?.click()}
                                 className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                                title="Upload Image"
+                                title={`Upload Images (${currentImages.length}/4)`}
+                                disabled={currentImages.length >= 4}
                             >
                                 <Image size={20} />
                             </button>
@@ -265,7 +312,7 @@ export default function InputArea() {
                     {/* Send Button */}
                     <button
                         onClick={handleSubmit}
-                        disabled={(!currentInput.trim() && !currentImage) || isGenerating}
+                        disabled={(!currentInput.trim() && currentImages.length === 0) || isGenerating}
                         className="p-2 bg-purple-500 hover:bg-purple-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
                         title="Send Message"
                     >
@@ -282,22 +329,25 @@ export default function InputArea() {
             <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/jpg,image/png"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
                 onChange={handleImageUpload}
                 className="hidden"
+                multiple
             />
         </div>
     );
 }
 
-function getSuccessMessage(type: GenerationType, modelVersion: MeshyModelVersion): string {
+function getSuccessMessage(type: GenerationType, modelVersion: MeshyModelVersion, imageCount: number): string {
     switch (type) {
         case 'text-to-3d':
             return `🎉 Your 3D model has been generated using ${modelVersion}! You can view it above, refine it further, or create something new.`;
         case 'image-to-3d':
-            return `📸 Successfully converted your image to a 3D model using ${modelVersion}! Feel free to refine it or upload another image.`;
+            const imageText = imageCount > 1 ? `${imageCount} images` : 'your image';
+            return `📸 Successfully converted ${imageText} to a 3D model using ${modelVersion}! Feel free to refine it or upload more images.`;
         case 'refine':
-            return `✨ Your model has been refined with new textures using ${modelVersion}! The enhanced version is ready for preview.`;
+            const refinementText = imageCount > 1 ? `with ${imageCount} reference images` : '';
+            return `✨ Your model has been refined ${refinementText} using ${modelVersion}! The enhanced version is ready for preview.`;
         default:
             return `✅ Generation complete using ${modelVersion}!`;
     }

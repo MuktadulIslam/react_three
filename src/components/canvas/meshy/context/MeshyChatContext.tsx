@@ -1,3 +1,4 @@
+// src/components/canvas/meshy/context/MeshyChatContext.tsx
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
@@ -29,7 +30,14 @@ interface MeshyChatContextType {
     currentInput: string;
     setCurrentInput: (input: string) => void;
 
-    // Current image for image-to-3d
+    // Current images for image-to-3d (now supports multiple)
+    currentImages: string[];
+    setCurrentImages: (images: string[]) => void;
+    addCurrentImage: (image: string) => void;
+    removeCurrentImage: (index: number) => void;
+    clearCurrentImages: () => void;
+
+    // Legacy single image support (for backward compatibility)
     currentImage: string | null;
     setCurrentImage: (image: string | null) => void;
 
@@ -69,12 +77,30 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
     });
     const [isGenerating, setIsGenerating] = useState(false);
     const [currentInput, setCurrentInput] = useState('');
-    const [currentImage, setCurrentImage] = useState<string | null>(null);
+
+    // Multi-image support
+    const [currentImages, setCurrentImages] = useState<string[]>([]);
+
+    // Legacy single image support (computed from currentImages)
+    const currentImage = currentImages.length > 0 ? currentImages[0] : null;
 
     const [currentModel, setCurrentModel] = useState<ModelOption>(modelOptions.find(option => option.value === 'meshy-4') || modelOptions[0]);
     const [currentGenerationType, setCurrentGenerationType] = useState<GenerationTypeOption>(generationTypeOptions.find(option => option.value === 'text-to-3d') || generationTypeOptions[0]);
     const [currentArtStyle, setCurrentArtStyle] = useState<ArtStyleOption>(artStyleOptions.find(option => option.value === 'realistic') || artStyleOptions[0]);
     const [currentSymmetry, setCurrentSymmetry] = useState<SymmetryOption>(symmetryOptions.find(option => option.value === 'auto') || symmetryOptions[0]);
+
+    // Auto-switch to meshy-5 when multiple images are uploaded
+    const handleImagesChange = useCallback((images: string[]) => {
+        setCurrentImages(images);
+
+        // Auto-switch to meshy-5 if more than one image and currently on meshy-4
+        if (images.length > 1 && currentModel.value === 'meshy-4') {
+            const meshy5Option = modelOptions.find(option => option.value === 'meshy-5');
+            if (meshy5Option) {
+                setCurrentModel(meshy5Option);
+            }
+        }
+    }, [currentModel.value]);
 
     const addMessage = useCallback((message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
         const newMessage: ChatMessage = {
@@ -119,7 +145,7 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
         setMessages([]);
         setGenerationContext({ generationHistory: [] });
         setCurrentInput('');
-        setCurrentImage(null);
+        setCurrentImages([]);
         setIsGenerating(false);
 
         // Add welcome message
@@ -138,8 +164,42 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
         setMessages([]);
         setGenerationContext({ generationHistory: [] });
         setCurrentInput('');
-        setCurrentImage(null);
+        setCurrentImages([]);
         setIsGenerating(false);
+    }, []);
+
+    // Multi-image management functions
+    const addCurrentImage = useCallback((image: string) => {
+        setCurrentImages(prev => {
+            if (prev.length >= 4) {
+                // Replace the last image if we're at the limit
+                return [...prev.slice(0, 3), image];
+            }
+            const newImages = [...prev, image];
+            handleImagesChange(newImages);
+            return newImages;
+        });
+    }, [handleImagesChange]);
+
+    const removeCurrentImage = useCallback((index: number) => {
+        setCurrentImages(prev => {
+            const newImages = prev.filter((_, i) => i !== index);
+            handleImagesChange(newImages);
+            return newImages;
+        });
+    }, [handleImagesChange]);
+
+    const clearCurrentImages = useCallback(() => {
+        setCurrentImages([]);
+    }, []);
+
+    // Legacy single image setter (for backward compatibility)
+    const setCurrentImage = useCallback((image: string | null) => {
+        if (image === null) {
+            setCurrentImages([]);
+        } else {
+            setCurrentImages([image]);
+        }
     }, []);
 
     const contextValue: MeshyChatContextType = {
@@ -159,6 +219,11 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
         setIsGenerating,
         currentInput,
         setCurrentInput,
+        currentImages,
+        setCurrentImages: handleImagesChange,
+        addCurrentImage,
+        removeCurrentImage,
+        clearCurrentImages,
         currentImage,
         setCurrentImage,
         currentGenerationType,
@@ -189,7 +254,7 @@ function getWelcomeMessage(type: GenerationType): string {
         case 'text-to-3d':
             return "👋 Hi! I'm your AI 3D model generator. Describe what you'd like to create and I'll generate a 3D model for you. You can also refine and iterate on models throughout our conversation!";
         case 'image-to-3d':
-            return "📸 Hi! Upload an image and I'll convert it into a 3D model. You can also add text descriptions to guide the generation process.";
+            return "📸 Hi! Upload up to 4 images and I'll convert them into a 3D model. The first image will be used as the primary reference, with additional images providing context. Multiple images automatically use our advanced Meshy-5 model!";
         case 'refine':
             return "✨ Hi! I can help you refine existing 3D models by adding textures and details. Upload a model or generate one first, then tell me how you'd like to improve it!";
         default:
