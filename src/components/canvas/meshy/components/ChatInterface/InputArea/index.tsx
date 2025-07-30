@@ -9,6 +9,7 @@ import AdvancedSettings from './AdvancedSettings';
 import { useGet3DFromText } from '../../../hooks/get3DFromText';
 import { useGet3DFromImage } from '../../../hooks/get3DFromImage';
 import { useRefineModel } from '../../../hooks/getRefineModel';
+import ImagePreview from './ImagePreview';
 
 export default function InputArea() {
     const {
@@ -226,48 +227,7 @@ export default function InputArea() {
 
     return (
         <div className="w-full h-auto p-2 border-t border-white/10">
-            {/* Multi-Image Preview */}
-            {currentImages.length > 0 && (currentGenerationType.value === 'image-to-3d' || currentGenerationType.value === 'refine') && (
-                <div className="py-2">
-                    <div className="flex flex-wrap gap-2">
-                        {currentImages.map((image, index) => (
-                            <div key={index} className="relative inline-block">
-                                <img
-                                    src={image}
-                                    alt={`Upload preview ${index + 1}`}
-                                    className="w-16 h-16 object-cover rounded-lg border border-white/20"
-                                />
-                                <button
-                                    onClick={() => removeCurrentImage(index)}
-                                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs"
-                                >
-                                    <X size={10} />
-                                </button>
-                            </div>
-                        ))}
-
-                        {/* Add more images button */}
-                        {currentImages.length < 4 && (
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="w-16 h-16 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-colors"
-                            >
-                                <Image size={20} />
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Multi-image info */}
-                    {currentImages.length > 1 && (
-                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-300">
-                            <AlertCircle size={14} />
-                            <span>
-                                {currentImages.length} images selected - using advanced Meshy-5 model for better multi-image processing
-                            </span>
-                        </div>
-                    )}
-                </div>
-            )}
+            <ImagePreview fileInputRef={fileInputRef}/>
 
             <div className="w-full flex flex-col min-h-20 max-h-60 bg-white/10 border border-white/20 rounded-xl backdrop-blur-sm">
                 <textarea

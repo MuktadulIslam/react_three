@@ -29,6 +29,8 @@ export const useGet3DFromImage = () => {
                     model_version: imageData.length > 1 ? 'meshy-5' : data.model_version
                 };
 
+                console.log(requestData)
+
                 const { data: responseData } = await axios.post(
                     '/api/meshy/image-to-3d',
                     requestData,

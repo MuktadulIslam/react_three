@@ -10,72 +10,38 @@ export async function POST(request: NextRequest) {
         // Handle both single image and multiple images
         const imageData = body.image_data;
         if (!imageData) {
-            return NextResponse.json(
-                { error: 'image_data is required' },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: 'image_data is required' },{ status: 400 });
         }
-
         // Validate image data format
         const images = Array.isArray(imageData) ? imageData : [imageData];
 
-        // Validate each image
-        for (let i = 0; i < images.length; i++) {
-            if (!images[i] || typeof images[i] !== 'string') {
-                return NextResponse.json(
-                    { error: `Invalid image data at index ${i}` },
-                    { status: 400 }
-                );
-            }
-
-            if (!images[i].startsWith('data:image/')) {
-                return NextResponse.json(
-                    { error: `Image ${i + 1} must be a valid data URI (data:image/...)` },
-                    { status: 400 }
-                );
-            }
-        }
 
         // Check image count limit
         if (images.length > 4) {
-            return NextResponse.json(
-                { error: 'Maximum 4 images allowed' },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: 'Maximum 4 images allowed' },{ status: 400 });
         }
 
-        // Prepare the payload - Meshy API currently only supports single image
-        // For multiple images, we'll use the first one as primary for now
-        // Future enhancement: implement proper multi-image handling when API supports it
-        const primaryImage = images[0];
+        const enhancedPrompt = body.texture_prompt ?
+                `${body.texture_prompt} (Generat 3D model from ${images.length > 1 ? 'these' : 'this'} reference ${images.length > 1 ? 'images' : 'image'})` :
+                `3D model generat from ${images.length} reference ${images.length > 1 ? 'images' : 'image'}`;
 
         const payload = {
-            image_url: primaryImage, // Use the first image as primary
+            image_url: images,
             ai_model: images.length > 1 ? 'meshy-5' : (body.model_version || meshyAPIConfig.aimodel),
-            texture_prompt: body.texture_prompt || '',
+            texture_prompt: enhancedPrompt,
             symmetry_mode: body.symmetry || 'auto',
             should_remesh: true,
             should_texture: true,
             enable_pbr: true,
         };
 
-        // Add additional context for multiple images in the texture prompt
-        if (images.length > 1) {
-            const enhancedPrompt = body.texture_prompt ?
-                `${body.texture_prompt} (Generated from ${images.length} reference images)` :
-                `3D model generated from ${images.length} reference images`;
-            payload.texture_prompt = enhancedPrompt;
-        }
-
-        console.log('Sending payload to Meshy API:', {
-            ...payload,
-            image_url: '[IMAGE_DATA]',
-            ai_model: payload.ai_model,
-            images_count: images.length
-        });
-
+        console.log("payload for image to 3D= ", payload);
+        
+        
+        
         const response = await meshyAxiosInstance.post(meshyAPIConfig.endpoints.imageTo3D, payload);
         const taskId = response.data.result;
+        console.log("response for image to 3D= ", response);
 
         if (!taskId) {
             throw new Error('No task ID received from Meshy API');

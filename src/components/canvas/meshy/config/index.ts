@@ -15,8 +15,8 @@ export const meshyAPIConfig = {
         textGenerated3D: (taskId: string) => `v2/text-to-3d/${taskId}`,
 
         // Image to 3D uses v1
-        imageTo3D: `v1/image-to-3d`,
-        imageGenerated3D: (taskId: string) => `v1/image-to-3d/${taskId}`,
+        imageTo3D: `v1/multi-image-to-3d`,
+        imageGenerated3D: (taskId: string) => `v1/multi-image-to-3d/${taskId}`,
 
         // Refine uses v2 text-to-3d endpoint
         refine: `v2/text-to-3d`,
