@@ -91,8 +91,6 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
 
     // Auto-switch to meshy-5 when multiple images are uploaded
     const handleImagesChange = useCallback((images: string[]) => {
-        setCurrentImages(images);
-
         // Auto-switch to meshy-5 if more than one image and currently on meshy-4
         if (images.length > 1 && currentModel.value === 'meshy-4') {
             const meshy5Option = modelOptions.find(option => option.value === 'meshy-5');
@@ -169,6 +167,11 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
     }, []);
 
     // Multi-image management functions
+    const setCurrentImagesFunction = useCallback((images: string[]) => {
+        setCurrentImages(images);
+        handleImagesChange(images);
+    }, [handleImagesChange]);
+
     const addCurrentImage = useCallback((image: string) => {
         setCurrentImages(prev => {
             if (prev.length >= 4) {
@@ -184,10 +187,9 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
     const removeCurrentImage = useCallback((index: number) => {
         setCurrentImages(prev => {
             const newImages = prev.filter((_, i) => i !== index);
-            handleImagesChange(newImages);
             return newImages;
         });
-    }, [handleImagesChange]);
+    }, []);
 
     const clearCurrentImages = useCallback(() => {
         setCurrentImages([]);
@@ -220,7 +222,7 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
         currentInput,
         setCurrentInput,
         currentImages,
-        setCurrentImages: handleImagesChange,
+        setCurrentImages: setCurrentImagesFunction,
         addCurrentImage,
         removeCurrentImage,
         clearCurrentImages,

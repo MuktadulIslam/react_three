@@ -22,7 +22,6 @@ export default function InputArea() {
         setCurrentInput,
         currentImages,
         addCurrentImage,
-        removeCurrentImage,
         clearCurrentImages,
         isGenerating,
         setIsGenerating,
@@ -56,9 +55,9 @@ export default function InputArea() {
             }
 
             // Check file type
-            const supportedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+            const supportedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
             if (!supportedTypes.includes(file.type)) {
-                reject(new Error('Please upload a JPG, JPEG, PNG, or WebP image'));
+                reject(new Error('Please upload a JPG, JPEG or PNG image'));
                 return;
             }
 
@@ -76,7 +75,6 @@ export default function InputArea() {
 
     const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files || []);
-
         if (files.length === 0) return;
 
         // Check if adding these files would exceed the limit
@@ -111,15 +109,13 @@ export default function InputArea() {
     const handleSubmit = async () => {
         if (!currentInput.trim() && currentImages.length === 0) return;
         if (isGenerating) return;
+        clearCurrentImages();
 
-        const userMessageContent = currentGenerationType.value === 'image-to-3d' && currentImages.length > 0 ?
-            `${currentInput.trim() || 'Generate 3D model from uploaded images'}` :
-            currentInput.trim();
 
         // Add user message with multiple images
         addMessage({
             type: 'user',
-            content: userMessageContent,
+            content: currentInput.trim(),
             generationType: currentGenerationType.value,
             imageUrls: currentImages.length > 0 ? currentImages : undefined,
             imageUrl: currentImages.length > 0 ? currentImages[0] : undefined // Backward compatibility
