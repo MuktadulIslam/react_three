@@ -1,6 +1,6 @@
 'use client';
 
-import { Bot, Download } from 'lucide-react';
+import { Bot, Download, Sparkles } from 'lucide-react';
 import { ChatMessage as ChatMessageType, Meshy3DObjectResponse } from '../../types';
 import AddToSidebarButton from '../AddToSidebarButton';
 import { ModelViewer } from '../ModelViewer';
@@ -18,7 +18,7 @@ interface AIMessageProps {
 }
 
 export default function AIMessage({ message, onAddToSidebar }: AIMessageProps) {
-    const { current3DModel } = useMeshyChat();
+    const { current3DModel, setCurrentRefineModelData } = useMeshyChat();
 
     const handleDownload = (model: Meshy3DObjectResponse, format: 'glb' | 'fbx' | 'obj') => {
         const url = model.model_urls?.[format];
@@ -38,6 +38,10 @@ export default function AIMessage({ message, onAddToSidebar }: AIMessageProps) {
             minute: '2-digit',
             hour12: false
         });
+    };
+
+    const needsRefinement = (model: Meshy3DObjectResponse): boolean => {
+        return !model.texture_urls || model.texture_urls.length === 0;
     };
 
     return (
@@ -80,6 +84,21 @@ export default function AIMessage({ message, onAddToSidebar }: AIMessageProps) {
                                     onAddToSidebar={onAddToSidebar}
                                 />
 
+                                {/* Refine Button - only show if model needs refinement */}
+                                {needsRefinement(message.modelData) && (
+                                    <button
+                                        onClick={() => setCurrentRefineModelData({
+                                            model_thumbnail_url:message.modelData?.thumbnail_url ?? '',
+                                            preview_task_id: message.modelData?.id ?? ''
+                                        })}
+                                        className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg text-sm transition-colors"
+                                        title="Add textures and materials to this model"
+                                    >
+                                        <Sparkles size={12} />
+                                        Refine Model
+                                    </button>
+                                )}
+
                                 {message.modelData.model_urls?.glb && (
                                     <button
                                         onClick={() => handleDownload(message.modelData!, 'glb')}
@@ -110,6 +129,14 @@ export default function AIMessage({ message, onAddToSidebar }: AIMessageProps) {
                                     </button>
                                 )}
                             </div>
+
+                            {/* Refinement Status Indicator */}
+                            {needsRefinement(message.modelData) && (
+                                <div className="flex items-center gap-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2 py-1">
+                                    <Sparkles size={12} />
+                                    <span>This model has no textures. Click "Refine Model" to add realistic materials and textures.</span>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

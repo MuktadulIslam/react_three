@@ -1,7 +1,6 @@
 // src/components/canvas/meshy/MeshySideBar.tsx
 'use client';
 
-import React, { useState } from 'react';
 import { MeshyChatProvider, useMeshyChat } from './context/MeshyChatContext';
 import MeshyHeader from './MeshyHeader';
 import ChatInterface from './components/ChatInterface';

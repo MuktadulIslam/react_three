@@ -7,7 +7,7 @@ export const useGet3DFromImage = () => {
     return useMutation({
         mutationFn: async (data: MeshyImageTo3DRequest): Promise<Meshy3DObjectResponse> => {
             // Handle both single image and multiple images
-            const imageData = Array.isArray(data.image_data) ? data.image_data : [data.image_data];
+            const imageData = data.image_data;
 
             if (imageData.length === 0 || !imageData[0]) {
                 throw new Error('At least one image is required');

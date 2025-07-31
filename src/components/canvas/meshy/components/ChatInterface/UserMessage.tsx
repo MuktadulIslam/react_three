@@ -1,7 +1,7 @@
 // src/components/canvas/meshy/components/ChatInterface/UserMessage.tsx
 'use client';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { User, Sparkles, Eye, RefreshCw } from 'lucide-react';
 import { ChatMessage as ChatMessageType } from '../../types';
 
@@ -44,6 +44,28 @@ export default function UserMessage({ message }: UserMessageProps) {
         }
     };
 
+    const modelImageComponent = useCallback((image_url: string | null) => {
+        if(image_url == null) return <></>;
+        return (
+            <div className="relative inline-block">
+                <img
+                    src={image_url}
+                    alt="Model to refine"
+                    className="w-32 h-32 object-cover rounded-lg border border-purple-400 bg-gray-800"
+                />
+                {/* Model indicator overlay */}
+                <div className="absolute inset-0 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <Sparkles size={12} className="text-purple-300" />
+                </div>
+                {/* Model label */}
+                <div className="absolute bottom-0 left-0 right-0 bg-purple-500 text-white text-[8px] text-center rounded-b-lg px-1">
+                    3D MODEL
+                </div>
+            </div>
+        );
+    }, []);
+
+
     // Use imageUrls if available (new multi-image support), fallback to imageUrl (backward compatibility)
     const displayImages = message.imageUrls || (message.imageUrl ? [message.imageUrl] : []);
 
@@ -57,7 +79,6 @@ export default function UserMessage({ message }: UserMessageProps) {
             {/* Message Content */}
             <div className="flex-1 max-w-[80%] text-right">
                 <div className="max-w-full inline-block p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white">
-
                     {/* Generation Type Badge */}
                     {message.generationType && (
                         <div className="flex items-center justify-end gap-1 mb-1 text-[9px] opacity-80 text-stone-200">
@@ -74,30 +95,23 @@ export default function UserMessage({ message }: UserMessageProps) {
                     {/* Multi-Image Preview for user messages */}
                     {displayImages.length > 0 && (
                         <div className="mb-2">
-                            {displayImages.length === 1 ? (
-                                // Single image - show larger
-                                <img
-                                    src={displayImages[0]}
-                                    alt="User uploaded image"
-                                    className="max-w-full h-32 object-cover rounded-lg border border-white/20"
-                                />
-                            ) : (
-                                // Multiple images - show in grid
-                                <div className="grid grid-cols-2 gap-2 max-w-full">
-                                    {displayImages.map((imageUrl, index) => (
-                                        <div key={index} className="relative">
-                                            <img
-                                                src={imageUrl}
-                                                alt={`User uploaded image ${index + 1}`}
-                                                className="w-full h-24 object-cover rounded-lg border border-white/20"
-                                            />
+                            <div className="grid grid-cols-2 gap-2 max-w-full">
+                                {modelImageComponent(message.refineModelData?.model_thumbnail_url ?? null)}
+                                {displayImages.map((imageUrl, index) => (
+                                    <div key={index} className="relative">
+                                        <img
+                                            src={imageUrl}
+                                            alt={`User uploaded image ${index + 1}`}
+                                            className="w-full h-32 object-cover rounded-lg border border-white/20"
+                                        />
+                                        {displayImages.length > 1 &&
                                             <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 rounded">
                                                 {index + 1}
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                                        }
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
 

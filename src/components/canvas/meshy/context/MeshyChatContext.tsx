@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-import { ChatMessage, ChatSession, GenerationType, Meshy3DObjectResponse, GenerationContext, MeshyModelVersion, ArtStyles, Symmetry, ModelOption, GenerationTypeOption, SymmetryOption, ArtStyleOption } from '../types';
+import { ChatMessage, ChatSession, GenerationType, Meshy3DObjectResponse, GenerationContext, MeshyModelVersion, ArtStyles, Symmetry, ModelOption, GenerationTypeOption, SymmetryOption, ArtStyleOption, MeshyRefineModel } from '../types';
 import { artStyleOptions, generationTypeOptions, modelOptions, symmetryOptions } from '../components/ChatInterface/InputArea/AdvancedSettings/constent';
 
 interface MeshyChatContextType {
@@ -60,6 +60,10 @@ interface MeshyChatContextType {
     // current Symmetry Type
     currentSymmetry: SymmetryOption;
     setCurrentSymmetry: (symmetry: SymmetryOption) => void;
+
+    // current MeshyRefineModel
+    currentRefineModelData: MeshyRefineModel | null
+    setCurrentRefineModelData: (model: MeshyRefineModel | null) => void
 }
 
 const MeshyChatContext = createContext<MeshyChatContextType | undefined>(undefined);
@@ -71,6 +75,7 @@ interface MeshyChatProviderProps {
 export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
     const [current3DModel, setCurrent3DModel] = useState<Meshy3DObjectResponse | null>(null);
     const [currentSession, setCurrentSession] = useState<ChatSession | null>(null);
+    const [currentRefineModel, setCurrentRefineModel] = useState<MeshyRefineModel | null>(null);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [generationContext, setGenerationContext] = useState<GenerationContext>({
         generationHistory: []
@@ -128,6 +133,11 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
 
     const updateGenerationContext = useCallback((context: Partial<GenerationContext>) => {
         setGenerationContext(prev => ({ ...prev, ...context }));
+    }, []);
+
+    const setCurrentRefineModelData = useCallback((model: MeshyRefineModel | null) => {
+        if (model && model.model_thumbnail_url != '' && model.preview_task_id != '') setCurrentRefineModel(model);
+        else setCurrentRefineModel(model);
     }, []);
 
     const startNewSession = useCallback((type: GenerationType) => {
@@ -233,7 +243,9 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
         currentArtStyle,
         setCurrentArtStyle,
         currentSymmetry,
-        setCurrentSymmetry
+        setCurrentSymmetry,
+        currentRefineModelData: currentRefineModel,
+        setCurrentRefineModelData
     };
 
     return (
@@ -257,9 +269,7 @@ function getWelcomeMessage(type: GenerationType): string {
             return "👋 Hi! I'm your AI 3D model generator. Describe what you'd like to create and I'll generate a 3D model for you. You can also refine and iterate on models throughout our conversation!";
         case 'image-to-3d':
             return "📸 Hi! Upload up to 4 images and I'll convert them into a 3D model. The first image will be used as the primary reference, with additional images providing context. Multiple images automatically use our advanced Meshy-5 model!";
-        case 'refine':
-            return "✨ Hi! I can help you refine existing 3D models by adding textures and details. Upload a model or generate one first, then tell me how you'd like to improve it!";
         default:
-            return "👋 Hi! How can I help you create amazing 3D models today?";
+            return "✨ Hi! I can help you refine existing 3D models by adding textures and details. Upload a model or generate one first, then tell me how you'd like to improve it!";
     }
 }

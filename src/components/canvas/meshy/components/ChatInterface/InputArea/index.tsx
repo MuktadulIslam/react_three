@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Image, X, Settings, AlertCircle } from 'lucide-react';
+import { Send, Image, X, Settings } from 'lucide-react';
 import { useMeshyChat } from '../../../context/MeshyChatContext';
 import { GenerationType, MeshyTextTo3DRequest, MeshyImageTo3DRequest, MeshyRefineRequest, MeshyModelVersion, } from '../../../types';
 import AdvancedSettings from './AdvancedSettings';
@@ -17,7 +17,6 @@ export default function InputArea() {
         addMessage,
         updateMessage,
         currentModel,
-        current3DModel,
         currentInput,
         setCurrentInput,
         currentImages,
@@ -28,7 +27,9 @@ export default function InputArea() {
         currentGenerationType,
         currentArtStyle,
         currentSymmetry,
-        setCurrent3DModel
+        setCurrent3DModel,
+        currentRefineModelData,
+        setCurrentRefineModelData
     } = useMeshyChat();
 
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
@@ -110,6 +111,7 @@ export default function InputArea() {
         if (!currentInput.trim() && currentImages.length === 0) return;
         if (isGenerating) return;
         clearCurrentImages();
+        setCurrentRefineModelData(null);
 
 
         // Add user message with multiple images
@@ -118,7 +120,8 @@ export default function InputArea() {
             content: currentInput.trim(),
             generationType: currentGenerationType.value,
             imageUrls: currentImages.length > 0 ? currentImages : undefined,
-            imageUrl: currentImages.length > 0 ? currentImages[0] : undefined // Backward compatibility
+            imageUrl: currentImages.length > 0 ? currentImages[0] : undefined, // Backward compatibility
+            refineModelData: currentRefineModelData ?? undefined,
         });
 
         // Add assistant thinking message
@@ -134,43 +137,37 @@ export default function InputArea() {
         try {
             let result;
 
-            switch (currentGenerationType.value) {
-                case 'text-to-3d':
-                    const textRequest: MeshyTextTo3DRequest = {
-                        prompt: currentInput.trim(),
-                        art_style: currentArtStyle.value,
-                        symmetry: currentSymmetry.value,
-                        seed: Math.floor(Math.random() * 1000000),
-                        model_version: currentModel.value
-                    };
-                    result = await textTo3DMutation.mutateAsync(textRequest);
-                    break;
-
-                case 'image-to-3d':
-                    const imageRequest: MeshyImageTo3DRequest = {
-                        image_data: currentImages.length > 1 ? currentImages : currentImages[0] || '',
-                        symmetry: currentSymmetry.value,
-                        model_version: currentModel.value,
-                        texture_prompt: currentInput.trim(),
-                    };
-                    result = await imageTo3DMutation.mutateAsync(imageRequest);
-                    break;
-
-                case 'refine':
-                    if (!current3DModel) {
-                        throw new Error('Please generate a model first before refining');
-                    }
-                    const refineRequest: MeshyRefineRequest = {
-                        texture_prompt: currentInput.trim(),
-                        texture_image_url: currentImages.length > 1 ? currentImages : currentImages[0],
-                        mode: 'refine',
-                        model_version: currentModel.value
-                    };
-                    result = await refineModelMutation.mutateAsync(refineRequest);
-                    break;
-
-                default:
-                    throw new Error('Invalid generation type');
+            if (currentRefineModelData != null) {
+                const refineRequest: MeshyRefineRequest = {
+                    preview_task_id: currentRefineModelData.preview_task_id,
+                    texture_prompt: currentInput.trim(),
+                    texture_image_url: currentImages,
+                    model_version: currentModel.value,
+                    moderation: true
+                };
+                result = await refineModelMutation.mutateAsync(refineRequest);
+            }
+            else if (currentGenerationType.value == 'text-to-3d') {
+                const textRequest: MeshyTextTo3DRequest = {
+                    prompt: currentInput.trim(),
+                    art_style: currentArtStyle.value,
+                    symmetry: currentSymmetry.value,
+                    seed: Math.floor(Math.random() * 1000000),
+                    model_version: currentModel.value
+                };
+                result = await textTo3DMutation.mutateAsync(textRequest);
+            }
+            else if (currentGenerationType.value == 'image-to-3d') {
+                const imageRequest: MeshyImageTo3DRequest = {
+                    image_data: currentImages,
+                    symmetry: currentSymmetry.value,
+                    model_version: currentModel.value,
+                    texture_prompt: currentInput.trim(),
+                };
+                result = await imageTo3DMutation.mutateAsync(imageRequest);
+            }
+            else {
+                throw new Error('Invalid generation type');
             }
 
             // Update current model
@@ -212,10 +209,6 @@ export default function InputArea() {
                 return currentImages.length > 0 ?
                     `Describe what you want to generate from ${currentImages.length} image(s) (optional)...` :
                     "Upload images and describe what you want to generate (optional)...";
-            case 'refine':
-                return currentModel ?
-                    "Describe the textures or refinements you want..." :
-                    "Generate a model first, then describe refinements...";
             default:
                 return "Type your message...";
         }
@@ -223,7 +216,7 @@ export default function InputArea() {
 
     return (
         <div className="w-full h-auto p-2 border-t border-white/10">
-            <ImagePreview fileInputRef={fileInputRef}/>
+            <ImagePreview fileInputRef={fileInputRef} />
 
             <div className="w-full flex flex-col min-h-20 max-h-60 bg-white/10 border border-white/20 rounded-xl backdrop-blur-sm">
                 <textarea
@@ -239,7 +232,7 @@ export default function InputArea() {
                 <div className="px-2 py-1.5 grow-0 flex items-center gap-2 text-xs text-gray-400 border-t border-white/10">
                     <div className='space-x-2'>
                         {/* Image Upload Button */}
-                        {(currentGenerationType.value === 'image-to-3d' || currentGenerationType.value === 'refine') && (
+                        {(currentGenerationType.value === 'image-to-3d' ||  currentRefineModelData) && (
                             <button
                                 onClick={() => fileInputRef.current?.click()}
                                 className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
@@ -301,9 +294,6 @@ function getSuccessMessage(type: GenerationType, modelVersion: MeshyModelVersion
         case 'image-to-3d':
             const imageText = imageCount > 1 ? `${imageCount} images` : 'your image';
             return `📸 Successfully converted ${imageText} to a 3D model using ${modelVersion}! Feel free to refine it or upload more images.`;
-        case 'refine':
-            const refinementText = imageCount > 1 ? `with ${imageCount} reference images` : '';
-            return `✨ Your model has been refined ${refinementText} using ${modelVersion}! The enhanced version is ready for preview.`;
         default:
             return `✅ Generation complete using ${modelVersion}!`;
     }

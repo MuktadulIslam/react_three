@@ -1,5 +1,5 @@
 // src/components/canvas/meshy/types.ts - UPDATED VERSION
-export type GenerationType = 'text-to-3d' | 'image-to-3d' | 'refine';
+export type GenerationType = 'text-to-3d' | 'image-to-3d';
 export type ArtStyles = 'realistic' | 'sculpture';
 export type Symmetry = 'auto' | 'on' | 'off';
 export type MeshyModelVersion = 'meshy-4' | 'meshy-5';
@@ -23,6 +23,11 @@ export interface ModelOption extends Options {
     value: MeshyModelVersion;
 }
 
+export interface MeshyRefineModel {
+    model_thumbnail_url: string,
+    preview_task_id: string
+}
+
 export interface MeshyTextTo3DRequest {
     prompt: string;
     art_style: ArtStyles;
@@ -35,32 +40,18 @@ export interface MeshyTextTo3DRequest {
 
 // Updated to match official API
 export interface MeshyImageTo3DRequest {
-    image_data: string | string[]; // Internal format - will be converted to image_urls
+    image_data: string[]; // Internal format - will be converted to image_urls
     model_version: MeshyModelVersion;
     symmetry: Symmetry;
     texture_prompt: string;
 }
 
-// Official Multi-Image API payload (what gets sent to Meshy)
-export interface MeshyMultiImageTo3DPayload {
-    image_urls: string[]; // Array of 1-4 image URLs or data URIs
-    ai_model?: MeshyModelVersion;
-    topology?: Topology;
-    target_polycount?: number;
-    symmetry_mode?: Symmetry;
-    should_remesh?: boolean;
-    should_texture?: boolean;
-    texture_prompt?: string;
-    moderation?: boolean;
-}
-
 export interface MeshyRefineRequest {
-    texture_prompt: string;
-    texture_image_url?: string | string[]; // Support multiple images for refinement
-    mode: 'refine';
-    moderation?: boolean;
-    ai_model?: string;
+    preview_task_id: string;
+    texture_prompt?: string;
+    texture_image_url?: string[]; // Support multiple images for refinement
     model_version?: MeshyModelVersion;
+    moderation?: boolean;
 }
 
 // Updated response type to match Meshy API exactly
@@ -104,6 +95,7 @@ export interface ChatMessage {
     imageUrls?: string[]; // New: Support multiple images
     modelData?: Meshy3DObjectResponse;
     isGenerating?: boolean;
+    refineModelData?: MeshyRefineModel;
 }
 
 export interface ChatSession {

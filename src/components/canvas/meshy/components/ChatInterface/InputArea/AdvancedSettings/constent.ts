@@ -8,7 +8,6 @@ export const artStyleOptions: ArtStyleOption[] = [
 export const generationTypeOptions: GenerationTypeOption[] = [
     { value: 'text-to-3d', label: 'Text to 3D', description: 'Generate 3D models from text descriptions', icon: '📝' },
     { value: 'image-to-3d', label: 'Image to 3D', description: 'Convert images to 3D models', icon: '🖼️' },
-    // { value: 'refine', label: 'Refine Model', description: 'Enhance existing 3D models', icon: '🎨' }
 ];
 
 export const symmetryOptions: SymmetryOption[] = [

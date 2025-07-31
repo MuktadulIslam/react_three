@@ -1,7 +1,6 @@
 // src/components/canvas/meshy/MeshyHeader.tsx
-import { X, Wand2, Image, Sparkles, Bot, MessageCircle } from 'lucide-react';
+import { X, Bot } from 'lucide-react';
 import { EB_Garamond } from 'next/font/google';
-import { useMeshyChat } from './context/MeshyChatContext';
 
 const ebGaramond = EB_Garamond({
     subsets: ['latin'],
@@ -13,29 +12,6 @@ interface MeshyHeaderProps {
 }
 
 export default function MeshyHeader({ setShow }: MeshyHeaderProps) {
-    const tabs = [
-        {
-            id: 'text-to-3d' as const,
-            label: 'Text to 3D',
-            icon: <Wand2 size={16} />,
-            color: 'text-purple-400',
-            activeColor: 'bg-purple-500/20 border-purple-500/50'
-        },
-        {
-            id: 'image-to-3d' as const,
-            label: 'Image to 3D',
-            icon: <Image size={16} />,
-            color: 'text-green-400',
-            activeColor: 'bg-green-500/20 border-green-500/50'
-        },
-        {
-            id: 'refine' as const,
-            label: 'Refine Model',
-            icon: <Sparkles size={16} />,
-            color: 'text-blue-400',
-            activeColor: 'bg-blue-500/20 border-blue-500/50'
-        }
-    ];
 
     return (
         <>
