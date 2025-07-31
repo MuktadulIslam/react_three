@@ -44,14 +44,14 @@ export default function ImagePreview({ fileInputRef }: ImagePreviewProps) {
             </div>
 
             {/* Multi-image info */}
-            {currentImages.length > 1 && (
+            {/* {currentImages.length > 1 && (
                 <div className="flex items-center gap-2 mt-2 text-xs text-gray-300">
                     <AlertCircle size={14} />
                     <span>
                         {currentImages.length} images selected - using advanced Meshy-5 model for better multi-image processing
                     </span>
                 </div>
-            )}
+            )} */}
         </div>
     );
 }

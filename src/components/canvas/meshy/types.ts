@@ -1,4 +1,4 @@
-// src/components/canvas/meshy/types.ts
+// src/components/canvas/meshy/types.ts - UPDATED VERSION
 export type GenerationType = 'text-to-3d' | 'image-to-3d' | 'refine';
 export type ArtStyles = 'realistic' | 'sculpture';
 export type Symmetry = 'auto' | 'on' | 'off';
@@ -29,13 +29,29 @@ export interface MeshyTextTo3DRequest {
     symmetry: Symmetry;
     seed?: number;
     model_version: MeshyModelVersion;
+    // For single image text-to-3d with image reference
+    texture_image_url?: string;
 }
 
+// Updated to match official API
 export interface MeshyImageTo3DRequest {
-    image_data: string | string[]; // Now supports multiple images
+    image_data: string | string[]; // Internal format - will be converted to image_urls
     model_version: MeshyModelVersion;
     symmetry: Symmetry;
     texture_prompt: string;
+}
+
+// Official Multi-Image API payload (what gets sent to Meshy)
+export interface MeshyMultiImageTo3DPayload {
+    image_urls: string[]; // Array of 1-4 image URLs or data URIs
+    ai_model?: MeshyModelVersion;
+    topology?: Topology;
+    target_polycount?: number;
+    symmetry_mode?: Symmetry;
+    should_remesh?: boolean;
+    should_texture?: boolean;
+    texture_prompt?: string;
+    moderation?: boolean;
 }
 
 export interface MeshyRefineRequest {
@@ -47,7 +63,7 @@ export interface MeshyRefineRequest {
     model_version?: MeshyModelVersion;
 }
 
-// Updated response type to match Meshy API
+// Updated response type to match Meshy API exactly
 export interface Meshy3DObjectResponse {
     id: string;
     model_urls?: {
@@ -71,6 +87,7 @@ export interface Meshy3DObjectResponse {
         normal?: string;
         roughness?: string;
     }>;
+    preceding_tasks?: number;
     task_error?: {
         message: string;
     } | null;

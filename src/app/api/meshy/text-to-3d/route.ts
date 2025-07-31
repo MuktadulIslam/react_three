@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
 
         const response = await meshyAxiosInstance.post(meshyAPIConfig.endpoints.textTo3D, payload);
         const object = await meshyAxiosInstance.get(meshyAPIConfig.endpoints.textGenerated3D(response.data.result));
+        console.log("3D model Data: ", object.data)
         return NextResponse.json(object.data);
 
     } catch (error) {

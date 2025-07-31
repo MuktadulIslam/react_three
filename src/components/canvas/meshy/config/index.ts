@@ -1,4 +1,4 @@
-// src/components/canvas/meshy/config/index.ts
+// src/components/canvas/meshy/config/index.ts - UPDATED VERSION
 import { MeshyModelVersion, Topology } from "../types";
 
 // Updated to use the correct API base URL
@@ -14,9 +14,8 @@ export const meshyAPIConfig = {
         textTo3D: `v2/text-to-3d`,
         textGenerated3D: (taskId: string) => `v2/text-to-3d/${taskId}`,
 
-        // Image to 3D uses v1
-        imageTo3D: `v1/multi-image-to-3d`,
-        imageGenerated3D: (taskId: string) => `v1/multi-image-to-3d/${taskId}`,
+        imageTo3D: `v1/image-to-3d`,
+        imageGenerated3D: (taskId: string) => `v1/image-to-3d/${taskId}`,
 
         // Refine uses v2 text-to-3d endpoint
         refine: `v2/text-to-3d`,
@@ -29,7 +28,8 @@ export const meshyFormats = {
     supportedImageFormats: ['image/jpeg', 'image/png', 'image/webp'],
     supportedModelFormats: ['.fbx', '.glb', '.obj'],
     maxImageSize: 10 * 1024 * 1024, // 10MB
-    maxModelSize: 50 * 1024 * 1024  // 50MB
+    maxModelSize: 50 * 1024 * 1024,  // 50MB
+    maxImages: 4 // Maximum images for multi-image endpoint
 };
 
 export const meshyDefaults = {
@@ -41,5 +41,16 @@ export const meshyDefaults = {
         { value: '1024', label: '1024x1024' },
         { value: '2048', label: '2048x2048' }
     ],
-    defaultNegativePrompt: 'low quality, low resolution, low poly, ugly, blurry, pixelated'
+    defaultNegativePrompt: 'low quality, low resolution, low poly, ugly, blurry, pixelated',
+    
+    // Multi-image specific defaults
+    multiImageDefaults: {
+        model: 'meshy-5' as MeshyModelVersion,
+        topology: 'triangle' as Topology,
+        target_polycount: 30000,
+        symmetry_mode: 'auto',
+        should_remesh: true,
+        should_texture: true,
+        moderation: false
+    }
 };

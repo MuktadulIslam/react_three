@@ -90,15 +90,15 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
     const [currentSymmetry, setCurrentSymmetry] = useState<SymmetryOption>(symmetryOptions.find(option => option.value === 'auto') || symmetryOptions[0]);
 
     // Auto-switch to meshy-5 when multiple images are uploaded
-    const handleImagesChange = useCallback((images: string[]) => {
-        // Auto-switch to meshy-5 if more than one image and currently on meshy-4
-        if (images.length > 1 && currentModel.value === 'meshy-4') {
-            const meshy5Option = modelOptions.find(option => option.value === 'meshy-5');
-            if (meshy5Option) {
-                setCurrentModel(meshy5Option);
-            }
-        }
-    }, [currentModel.value]);
+    // const handleImagesChange = useCallback((images: string[]) => {
+    //     // Auto-switch to meshy-5 if more than one image and currently on meshy-4
+    //     if (images.length > 1 && currentModel.value === 'meshy-4') {
+    //         const meshy5Option = modelOptions.find(option => option.value === 'meshy-5');
+    //         if (meshy5Option) {
+    //             setCurrentModel(meshy5Option);
+    //         }
+    //     }
+    // }, [currentModel.value]);
 
     const addMessage = useCallback((message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
         const newMessage: ChatMessage = {
@@ -169,8 +169,8 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
     // Multi-image management functions
     const setCurrentImagesFunction = useCallback((images: string[]) => {
         setCurrentImages(images);
-        handleImagesChange(images);
-    }, [handleImagesChange]);
+        // handleImagesChange(images);
+    }, []);
 
     const addCurrentImage = useCallback((image: string) => {
         setCurrentImages(prev => {
@@ -179,10 +179,10 @@ export function MeshyChatProvider({ children }: MeshyChatProviderProps) {
                 return [...prev.slice(0, 3), image];
             }
             const newImages = [...prev, image];
-            handleImagesChange(newImages);
+            // handleImagesChange(newImages);
             return newImages;
         });
-    }, [handleImagesChange]);
+    }, []);
 
     const removeCurrentImage = useCallback((index: number) => {
         setCurrentImages(prev => {
