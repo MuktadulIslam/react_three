@@ -1,4 +1,3 @@
-// src/app/api/meshy/model/route.ts - FIXED VERSION
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {

@@ -18,9 +18,25 @@ export async function POST(request: NextRequest) {
         };
 
         const response = await meshyAxiosInstance.post(meshyAPIConfig.endpoints.textTo3D, payload);
-        const object = await meshyAxiosInstance.get(meshyAPIConfig.endpoints.textGenerated3D(response.data.result));
-        console.log("3D model Data: ", object.data)
-        return NextResponse.json(object.data);
+        
+        // Poll for completion (simple polling approach 5 times in 5s interval)
+        let attempts = 0;
+        const maxAttempts = 5;
+        const pollInterval = 5000;
+        while (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, pollInterval));
+            attempts++;
+            
+            const object = await meshyAxiosInstance.get(meshyAPIConfig.endpoints.textGenerated3D(response.data.result));
+            if (object.data.status === 'SUCCEEDED') {
+                return NextResponse.json(object.data);
+            }
+        }
+
+        return NextResponse.json(
+            { error: 'Failed to generate 3D model from text' },
+            { status: 500 }
+        );
 
     } catch (error) {
         console.error('Text-to-3D API error:', error);

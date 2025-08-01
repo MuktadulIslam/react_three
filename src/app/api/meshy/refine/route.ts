@@ -7,21 +7,38 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
 
         const payload = {
+            mode: "refine",
+            preview_task_id: body.preview_task_id,
             texture_prompt: body.texture_prompt,
-            texture_image_url: body.image,  //Data URI: A base64-encoded data URI of the image. Example of a data URI: data:image/jpeg;base64,<your base64-encoded image data>
-            mode: 'refine',
-            moderation: true,
-            ai_model: meshyAPIConfig.aimodel,
+            texture_image_url:  body.texture_image_url[0],      // This image should be in base-64 formet & meshy model only takes 1 image for texture
+            ai_model: body.model_version || meshyAPIConfig.aimodel,
+            moderation: body.moderation || true
         };
 
         const response = await meshyAxiosInstance.post(meshyAPIConfig.endpoints.textTo3D, payload);
-        const object = await meshyAxiosInstance.get(meshyAPIConfig.endpoints.textGenerated3D(response.data.result));
-        return NextResponse.json(object.data);
+        
+        // Poll for completion (simple polling approach 5 times in 5s interval)
+        let attempts = 0;
+        const maxAttempts = 5;
+        const pollInterval = 5000;
+        while (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, pollInterval));
+            attempts++;
+            
+            const object = await meshyAxiosInstance.get(meshyAPIConfig.endpoints.textGenerated3D(response.data.result));
+            if (object.data.status === 'SUCCEEDED') {
+                return NextResponse.json(object.data);
+            }
+        }
 
-    } catch (error) {
-        console.error('Text-to-3D API error:', error);
         return NextResponse.json(
-            { error: 'Failed to generate 3D model from text' },
+            { error: '3D model refine failed' },
+            { status: 500 }
+        );
+    } catch (error) {
+        console.error('3D model refine API error:', error);
+        return NextResponse.json(
+            { error: '3D model refine failed' },
             { status: 500 }
         );
     }

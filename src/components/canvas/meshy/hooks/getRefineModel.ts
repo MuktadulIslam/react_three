@@ -10,19 +10,12 @@ export const useRefineModel = () => {
                 throw new Error('Valid preview task id is required');
             }
 
-            const payload = {
-                ...data
-            }
-            console.log(payload)
+            const payload = { ...data }
 
             const { data: responseData } = await axios.post(
                 '/api/meshy/refine',
                 JSON.stringify(payload),
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
+                { headers: { 'Content-Type': 'application/json', } }
             );
             return responseData;
         },

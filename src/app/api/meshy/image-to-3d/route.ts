@@ -1,4 +1,3 @@
-// src/app/api/meshy/image-to-3d/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { meshyAPIConfig } from '@/components/canvas/meshy/config';
 import meshyAxiosInstance from '../axios-config';
