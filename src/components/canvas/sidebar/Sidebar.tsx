@@ -7,6 +7,7 @@ import SidebarGroupedObjects from "./SidebarGroupedObjects"
 import { DraggableObjectGroup, DraggableObjectData } from './types'
 import Dynamic3DModel from "./Dynamic3DModel"
 import { SketchfabModel } from "../sketchfab/types"
+import { Meshy3DObjectResponse } from "../meshy/types"
 import { sidebarStaticObjectGroups } from "./utils"
 
 interface UploadedFile {
@@ -17,6 +18,7 @@ interface UploadedFile {
     uploadDate: Date;
     source?: 'upload' | 'sketchfab' | 'meshy'; // Updated to include meshy
     sketchfabModel?: SketchfabModel;
+    meshyModel?: Meshy3DObjectResponse; // Add meshy model reference
 }
 
 export default function Sidebar(
@@ -62,6 +64,40 @@ export default function Sidebar(
 
         setUploadedFiles(prev => [...prev, sketchfabFile]);
         console.log('Successfully added Sketchfab model to sidebar:', modelData.name);
+    }, []);
+
+    // Add Meshy model handler
+    const handleMeshyModelAdd = useCallback((modelData: {
+        id: string;
+        name: string;
+        url: string;
+        fileType: 'glb';
+        model: Meshy3DObjectResponse;
+    }) => {
+        console.log('🤖 Adding Meshy model to sidebar:', {
+            id: modelData.id,
+            name: modelData.name,
+            url: modelData.url ? 'URL created' : 'No URL',
+            fileType: modelData.fileType
+        });
+
+        const meshyFile: UploadedFile = {
+            id: modelData.id,
+            name: modelData.name,
+            url: modelData.url,
+            fileType: modelData.fileType,
+            uploadDate: new Date(),
+            source: 'meshy',
+            meshyModel: modelData.model
+        };
+
+        setUploadedFiles(prev => {
+            const updated = [...prev, meshyFile];
+            console.log('📁 Updated uploaded files count:', updated.length);
+            return updated;
+        });
+        
+        console.log('✅ Successfully added Meshy AI model to sidebar:', modelData.name);
     }, []);
 
     // Convert uploaded files to draggable objects
@@ -143,6 +179,7 @@ export default function Sidebar(
             <MeshySideBar
                 show={showMeshyGeneration}
                 setShow={setShowMeshyGeneration}
+                onAddModelToSidebar={handleMeshyModelAdd}
             />
 
             <div className={`absolute left-0 top-0 h-full w-80 ${visible ? '' : '-translate-x-80'} transition-all duration-200 bg-gray-900/90 backdrop-blur-md text-white flex flex-col z-40 shadow-2xl border-r border-gray-700/50 overflow-hidden`}>

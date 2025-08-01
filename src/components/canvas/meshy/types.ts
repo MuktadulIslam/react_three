@@ -114,3 +114,12 @@ export interface GenerationContext {
     baseImages?: string[]; // New: Support multiple base images
     generationHistory: ChatMessage[];
 }
+
+// Interface for sidebar model data
+export interface SidebarModelData {
+    id: string;
+    name: string;
+    url: string;
+    fileType: 'glb';
+    model: Meshy3DObjectResponse;
+}
