@@ -1,8 +1,7 @@
-// src/components/canvas/meshy/context/MeshyChatContext.tsx
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-import { ChatMessage, ChatSession, GenerationType, Meshy3DObjectResponse, GenerationContext, MeshyModelVersion, ArtStyles, Symmetry, ModelOption, GenerationTypeOption, SymmetryOption, ArtStyleOption, MeshyRefineModel } from '../types';
+import { ChatMessage, ChatSession, GenerationType, Meshy3DObjectResponse, GenerationContext, ModelOption, GenerationTypeOption, SymmetryOption, ArtStyleOption, MeshyRefineModel } from '../types';
 import { artStyleOptions, generationTypeOptions, modelOptions, symmetryOptions } from '../components/ChatInterface/InputArea/AdvancedSettings/constent';
 
 interface MeshyChatContextType {

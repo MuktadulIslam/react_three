@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/MeshySideBar.tsx
 'use client';
 
 import { MeshyChatProvider } from './context/MeshyChatContext';
@@ -23,7 +22,6 @@ function MeshySideBarContent({ show, setShow, onAddModelToSidebar }: MeshySideBa
             <div className="w-full h-full flex flex-col overflow-hidden">
                 <MeshyHeader setShow={setShow} />
 
-                {/* Content */}
                 <div className="flex-1 min-h-0">
                     <ChatInterface onAddModelToSidebar={onAddModelToSidebar} />
                 </div>

@@ -1,6 +1,8 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { SketchfabResponse } from '@/components/canvas/sketchfab/types'
+import { SketchfabResponse } from '../types';
 
 const modelsOffsetLimit = 18;
 
@@ -19,7 +21,6 @@ export const useGetSketchfabModels = (searchQuery: string, pageNumber: number) =
             const { data } = await axiosInstance.get(`/search?count=${modelsOffsetLimit}&cursor=${(pageNumber - 1) * modelsOffsetLimit}&downloadable=true&q=${encodeURIComponent(searchQuery)}&sort_by=-likeCount&type=models`);
             return data;
         },
-        enabled: !!searchQuery && searchQuery.trim().length > 0, // Only run when searchQuery exists and is not empty
-
+        enabled: !!searchQuery && searchQuery.trim().length > 0,
     });
 };

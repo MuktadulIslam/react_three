@@ -1,20 +1,18 @@
-// src/components/canvas/sketchfab/SketchfabSearchSideBar.tsx
-'use client'
+'use client';
 
-import { useState, useCallback, useMemo } from "react";
-import SidebarHeader from "./Header";
-import SearchBarUtils from "./searchBarUtils";
-import ThreeDModelCard from "./ThreeDModelCard";
-import { SketchfabModel } from "./types";
-import ModelViewer from "./ModelViewer";
-import SketchfabLogin from "./SektchfabLogin";
+import { useState, useCallback } from "react";
 import { SketchfabProvider } from "./context/SketchfabProvider";
 import { useSketchfabAuth } from "./context/SketchfabAuthContext";
 import { useSketchfabDownload } from "./context/SketchfabDownloadContext";
-import { NotificationManager } from "./Notification";
-import SketchfabAuthHeader from "./SketchfabAuthHeader";
+import { SketchfabModel } from "./types";
+import SketchfabHeader from "./components/SketchfabHeader";
+import SketchfabAuthHeader from "./components/SketchfabAuthHeader";
+import SketchfabLogin from "./components/SketchfabLogin";
+import SearchInterface from "./components/SearchInterface";
+import ModelViewer from "./components/ModelViewer";
+import NotificationManager from "./components/NotificationManager";
 
-interface SketchfabSearchSideBarProps {
+interface SketchfabSideBarProps {
     show: boolean;
     setShow: (show: boolean) => void;
     onAddModelToSidebar?: (modelData: {
@@ -27,14 +25,6 @@ interface SketchfabSearchSideBarProps {
     existingModelUids?: string[];
 }
 
-export default function SketchfabSearchSideBar({ show, setShow, onAddModelToSidebar, existingModelUids = [] }: SketchfabSearchSideBarProps) {
-    return (
-        <SketchfabProvider>
-            <SketchfabSearch show={show} setShow={setShow} onAddModelToSidebar={onAddModelToSidebar} existingModelUids={existingModelUids} />
-        </SketchfabProvider>
-    );
-}
-
 interface NotificationData {
     id: string;
     message: string;
@@ -42,14 +32,13 @@ interface NotificationData {
     duration?: number;
 }
 
-function SketchfabSearch({ show, setShow, onAddModelToSidebar, existingModelUids = [] }: SketchfabSearchSideBarProps) {
+function SketchfabSideBarContent({ show, setShow, onAddModelToSidebar, existingModelUids = [] }: SketchfabSideBarProps) {
     const [selectedModel, setSelectedModel] = useState<SketchfabModel | null>(null);
     const [downloadingModelId, setDownloadingModelId] = useState<string | null>(null);
     const [addingToSidebarId, setAddingToSidebarId] = useState<string | null>(null);
     const [addToSidebarProgress, setAddToSidebarProgress] = useState<number>(0);
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
 
-    const { models, SearchBar, ModelLoadingUtils } = SearchBarUtils();
     const { authenticated, loading } = useSketchfabAuth();
     const { downloadGLB, getDownloadOptions } = useSketchfabDownload();
 
@@ -76,7 +65,6 @@ function SketchfabSearch({ show, setShow, onAddModelToSidebar, existingModelUids
     }, [getDownloadOptions, downloadGLB, addNotification]);
 
     const handleAddToSidebar = useCallback(async (model: SketchfabModel) => {
-        // Check if model is already in sidebar
         if (existingModelUids.includes(model.uid)) {
             addNotification(`"${model.name}" is already in the sidebar!`, 'info', 3000);
             return;
@@ -122,7 +110,6 @@ function SketchfabSearch({ show, setShow, onAddModelToSidebar, existingModelUids
             onAddModelToSidebar(modelData);
 
             addNotification(`✨ "${model.name}" added to sidebar!`, 'success', 4000);
-
             await new Promise(resolve => setTimeout(resolve, 500));
 
         } catch (error) {
@@ -135,29 +122,6 @@ function SketchfabSearch({ show, setShow, onAddModelToSidebar, existingModelUids
         }
     }, [existingModelUids, onAddModelToSidebar, getDownloadOptions, addNotification]);
 
-    // Memoize the models grid to prevent unnecessary re-renders
-    const modelsGrid = useMemo(() => {
-        if (models.length === 0) return null;
-
-        return (
-            <div className="grid grid-cols-3 gap-4 p-2">
-                {models.map((model, index) => (
-                    <ThreeDModelCard
-                        key={`${model.uid}-${index}`}
-                        model={model}
-                        setSelectedModel={setSelectedModel}
-                        handleDownloadModel={handleDownloadModel}
-                        handleAddToSidebar={handleAddToSidebar}
-                        downloadingModelId={downloadingModelId}
-                        addingToSidebarId={addingToSidebarId}
-                        addToSidebarProgress={addToSidebarProgress}
-                        isAlreadyInSidebar={existingModelUids.includes(model.uid)}
-                    />
-                ))}
-            </div>
-        );
-    }, [models, handleDownloadModel, handleAddToSidebar, downloadingModelId, addingToSidebarId, addToSidebarProgress, existingModelUids]);
-
     const handleCloseViewer = useCallback(() => {
         setSelectedModel(null);
     }, []);
@@ -169,7 +133,7 @@ function SketchfabSearch({ show, setShow, onAddModelToSidebar, existingModelUids
                 removeNotification={removeNotification}
             />
 
-            {selectedModel != null && (
+            {selectedModel && (
                 <ModelViewer
                     model={selectedModel}
                     handleDownloadModel={handleDownloadModel}
@@ -182,33 +146,53 @@ function SketchfabSearch({ show, setShow, onAddModelToSidebar, existingModelUids
             )}
 
             <div className="w-full h-full overflow-auto">
-                {!loading && authenticated &&
+                {!loading && authenticated && (
                     <SketchfabAuthHeader onNotify={addNotification} />
-                }
-                <SidebarHeader setShow={setShow} />
+                )}
+                
+                <SketchfabHeader setShow={setShow} />
+                
                 {loading ? (
-                    <div className="h-full w-full flex flex-col justify-center items-center text-gray-800">
-                        <div className="mb-4">
-                            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-blue-400"></div>
-                        </div>
-                        <div className="text-xl font-semibold">Loading...</div>
-                        <div className="text-sm text-gray-600 mt-2">Connecting to Sketchfab</div>
-                        <div className="flex gap-1 mt-3">
-                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                        </div>
-                    </div>
+                    <LoadingSpinner />
                 ) : !authenticated ? (
                     <SketchfabLogin />
                 ) : (
-                    <>
-                        <SearchBar />
-                        {modelsGrid}
-                        <ModelLoadingUtils />
-                    </>
+                    <SearchInterface
+                        onModelSelect={setSelectedModel}
+                        onDownloadModel={handleDownloadModel}
+                        onAddToSidebar={handleAddToSidebar}
+                        downloadingModelId={downloadingModelId}
+                        addingToSidebarId={addingToSidebarId}
+                        addToSidebarProgress={addToSidebarProgress}
+                        existingModelUids={existingModelUids}
+                    />
                 )}
             </div>
         </div>
+    );
+}
+
+function LoadingSpinner() {
+    return (
+        <div className="h-full w-full flex flex-col justify-center items-center text-gray-800">
+            <div className="mb-4">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-blue-400"></div>
+            </div>
+            <div className="text-xl font-semibold">Loading...</div>
+            <div className="text-sm text-gray-600 mt-2">Connecting to Sketchfab</div>
+            <div className="flex gap-1 mt-3">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            </div>
+        </div>
+    );
+}
+
+export default function SketchfabSideBar(props: SketchfabSideBarProps) {
+    return (
+        <SketchfabProvider>
+            <SketchfabSideBarContent {...props} />
+        </SketchfabProvider>
     );
 }

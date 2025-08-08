@@ -59,7 +59,6 @@ export default function AddToSidebarButton({
 
         } catch (error) {
             console.error('Failed to add model to sidebar:', error);
-            // You could add error handling here, like showing a toast notification
         } finally {
             setIsAdding(false);
         }

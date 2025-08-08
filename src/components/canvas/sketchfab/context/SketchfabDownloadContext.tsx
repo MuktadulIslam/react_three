@@ -1,4 +1,3 @@
-// src/components/canvas/sketchfab/context/SketchfabDownloadContext.tsx
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';

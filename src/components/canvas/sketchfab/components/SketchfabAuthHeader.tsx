@@ -1,6 +1,7 @@
-// src/components/canvas/sketchfab/SketchfabAuthHeader.tsx
+'use client';
+
 import { LogOut, User } from 'lucide-react';
-import { useSketchfabAuth } from './context/SketchfabAuthContext';
+import { useSketchfabAuth } from '../context/SketchfabAuthContext';
 
 interface SketchfabAuthHeaderProps {
     onNotify?: (message: string, type: 'success' | 'error' | 'info') => void;

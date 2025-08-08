@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/components/ChatInterface/InputArea/ImagePreview.tsx
 import { Image, X, Sparkles } from 'lucide-react';
 import { useMeshyChat } from "../../../context/MeshyChatContext";
 

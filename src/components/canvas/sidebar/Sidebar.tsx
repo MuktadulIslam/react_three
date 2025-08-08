@@ -1,6 +1,6 @@
 // src/components/canvas/sidebar/Sidebar.tsx (Updated)
 import { useState, useCallback } from "react"
-import SketchfabSearchSideBar from '../sketchfab/SketchfabSearchSideBar';
+import SketchfabSideBar from '../sketchfab/SketchfabSideBar';
 import MeshySideBar from '../meshy/MeshySideBar'; // New import
 import SidebarHeader from "./SidebarHeader"
 import SidebarGroupedObjects from "./SidebarGroupedObjects"
@@ -169,7 +169,7 @@ export default function Sidebar(
 
     return (
         <div>
-            <SketchfabSearchSideBar
+            <SketchfabSideBar
                 show={showSketchfabSearch}
                 setShow={setShowSketchfabSearch}
                 onAddModelToSidebar={handleSketchfabModelAdd}

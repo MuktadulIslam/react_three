@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/hooks/get3DFromImage.ts - FIXED VERSION
 import { useMutation } from '@tanstack/react-query';
 import { MeshyImageTo3DRequest, Meshy3DObjectResponse } from '../types';
 import axios from 'axios';
@@ -6,7 +5,6 @@ import axios from 'axios';
 export const useGet3DFromImage = () => {
     return useMutation({
         mutationFn: async (data: MeshyImageTo3DRequest): Promise<Meshy3DObjectResponse> => {
-            // Handle both single image and multiple images
             const imageData = data.image_data;
 
             if (imageData.length === 0 || !imageData[0]) {
@@ -20,10 +18,7 @@ export const useGet3DFromImage = () => {
                 }
             }
 
-            // Check image count limit
-            if (imageData.length > 4) {
-                throw new Error('Maximum 4 images allowed');
-            }
+            if (imageData.length > 4) { throw new Error('Maximum 4 images allowed'); }
 
             try {
                 const payload = {
@@ -50,7 +45,6 @@ export const useGet3DFromImage = () => {
                     const errorMessage = error.response?.data?.error || error.message;
                     const errorDetails = error.response?.data?.details || 'Unknown error';
 
-                    // Provide more specific error messages
                     if (error.response?.status === 400) {
                         throw new Error(`Invalid request: ${errorMessage}`);
                     } else if (error.response?.status === 408) {

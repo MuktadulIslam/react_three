@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/components/ChatInterface/InputArea/index.tsx
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';

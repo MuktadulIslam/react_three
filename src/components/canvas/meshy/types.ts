@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/types.ts - UPDATED VERSION
 export type GenerationType = 'text-to-3d' | 'image-to-3d';
 export type ArtStyles = 'realistic' | 'sculpture';
 export type Symmetry = 'auto' | 'on' | 'off';
@@ -34,13 +33,11 @@ export interface MeshyTextTo3DRequest {
     symmetry: Symmetry;
     seed?: number;
     model_version: MeshyModelVersion;
-    // For single image text-to-3d with image reference
     texture_image_url?: string;
 }
 
-// Updated to match official API
 export interface MeshyImageTo3DRequest {
-    image_data: string[]; // Internal format - will be converted to image_urls
+    image_data: string[];
     model_version: MeshyModelVersion;
     symmetry: Symmetry;
     texture_prompt: string;
@@ -49,12 +46,11 @@ export interface MeshyImageTo3DRequest {
 export interface MeshyRefineRequest {
     preview_task_id: string;
     texture_prompt?: string;
-    texture_image_url?: string[]; // Support multiple images for refinement
+    texture_image_url?: string[];
     model_version?: MeshyModelVersion;
     moderation?: boolean;
 }
 
-// Updated response type to match Meshy API exactly
 export interface Meshy3DObjectResponse {
     id: string;
     model_urls?: {
@@ -84,15 +80,14 @@ export interface Meshy3DObjectResponse {
     } | null;
 }
 
-// Chat interface types
 export interface ChatMessage {
     id: string;
     type: 'user' | 'assistant';
     content: string;
     timestamp: Date;
     generationType?: GenerationType;
-    imageUrl?: string; // For backward compatibility
-    imageUrls?: string[]; // New: Support multiple images
+    imageUrl?: string;
+    imageUrls?: string[];
     modelData?: Meshy3DObjectResponse;
     isGenerating?: boolean;
     refineModelData?: MeshyRefineModel;
@@ -111,7 +106,7 @@ export interface GenerationContext {
     currentModel?: Meshy3DObjectResponse;
     basePrompt?: string;
     baseImage?: string;
-    baseImages?: string[]; // New: Support multiple base images
+    baseImages?: string[];
     generationHistory: ChatMessage[];
 }
 

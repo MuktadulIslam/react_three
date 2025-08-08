@@ -1,4 +1,3 @@
-// src/components/canvas/sketchfab/context/SketchfabAuthContext.tsx
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from 'react';

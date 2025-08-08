@@ -1,17 +1,19 @@
+'use client';
+
 import { X } from 'lucide-react';
-import { EB_Garamond } from 'next/font/google'
+import { EB_Garamond } from 'next/font/google';
 
 const ebGaramond = EB_Garamond({
     subsets: ['latin'],
     weight: ['800'],
-})
+});
 
-interface SidebarHeaderProps {
+interface SketchfabHeaderProps {
     setShow: (show: boolean) => void;
 }
 
-export default function SidebarHeader({ setShow }: SidebarHeaderProps) {
-    return (<>
+export default function SketchfabHeader({ setShow }: SketchfabHeaderProps) {
+    return (
         <div className="text-center mb-5 mt-3 relative">
             <button
                 onClick={() => setShow(false)}
@@ -30,5 +32,5 @@ export default function SidebarHeader({ setShow }: SidebarHeaderProps) {
                 💡 Tip: You may need a free Sketchfab account to download models
             </div>
         </div>
-    </>)
+    );
 }

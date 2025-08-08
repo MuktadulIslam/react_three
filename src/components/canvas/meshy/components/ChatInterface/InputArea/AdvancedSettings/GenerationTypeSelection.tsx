@@ -1,5 +1,3 @@
-'use client'
-
 import { ChevronDown } from 'lucide-react';
 import { useMeshyChat } from "../../../../context/MeshyChatContext";
 import { generationTypeOptions } from "./constent";

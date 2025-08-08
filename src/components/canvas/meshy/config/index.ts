@@ -1,11 +1,10 @@
-// src/components/canvas/meshy/config/index.ts - UPDATED VERSION
 import { MeshyModelVersion, Topology } from "../types";
 
-// Updated to use the correct API base URL
 const baseUrl = 'https://api.meshy.ai/openapi';
 
 export const meshyAPIConfig = {
     apiKey: process.env.MESHY_API_KEY || 'msy_dummy_api_key_for_test_mode_12345678',
+    // apiKey: process.env.MESHY_API_KEY || 'msy_P5hZAvmeUPtsFhlz69WMHiIM4Ypdl4odFDtN' || 'msy_dummy_api_key_for_test_mode_12345678',
     aimodel: 'meshy-4' as MeshyModelVersion,
     topology: 'triangle' as Topology,
     target_polycount: 30000,

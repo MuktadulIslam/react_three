@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/components/ChatInterface/UserMessage.tsx
 'use client';
 
 import React, { useCallback } from 'react';

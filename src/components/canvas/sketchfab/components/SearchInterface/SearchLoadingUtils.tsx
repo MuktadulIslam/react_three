@@ -1,29 +1,27 @@
 import { Download } from 'lucide-react';
-import SketchfabSearchSkeleton from './SketchfabSearchSkeleton';
+import SearchSkeleton from './SearchSkeleton';
 
-interface ModelLoadingUtilsProps {
-    hasNext: boolean,
-    isLoading: boolean,
-    modelsLength: number,
-    hasSearched: boolean, // This now represents shouldShowNoResults
-    isError: boolean,
-    setCurrentPageNumber: React.Dispatch<React.SetStateAction<number>>
+interface SearchLoadingUtilsProps {
+    hasNext: boolean;
+    isLoading: boolean;
+    modelsLength: number;
+    shouldShowNoResults: boolean;
+    isError: boolean;
+    setCurrentPageNumber: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function ModelLoadingUtils({
+export default function SearchLoadingUtils({
     hasNext,
     isLoading,
     modelsLength,
-    hasSearched, // This is now shouldShowNoResults from searchBarUtils
+    shouldShowNoResults,
     isError,
     setCurrentPageNumber
-}: ModelLoadingUtilsProps) {
+}: SearchLoadingUtilsProps) {
     return (
         <>
-            {/* Initial Loading (when no models yet) */}
-            {isLoading && modelsLength === 0 && (
-                <SketchfabSearchSkeleton />
-            )}
+            {/* Initial Loading */}
+            {isLoading && modelsLength === 0 && <SearchSkeleton />}
 
             {/* Error State */}
             {isError && (
@@ -34,8 +32,8 @@ export default function ModelLoadingUtils({
                 </div>
             )}
 
-            {/* No Results Found - only show when explicitly determined */}
-            {hasSearched && (
+            {/* No Results Found */}
+            {shouldShowNoResults && (
                 <div className="p-28">
                     <div className="text-center p-8 bg-black/70 rounded-2xl">
                         <div className="text-gray-400 text-6xl mb-4">🔍</div>
@@ -64,7 +62,7 @@ export default function ModelLoadingUtils({
                 </div>
             )}
 
-            {/* Loading More State (when adding to existing results) */}
+            {/* Loading More State */}
             {isLoading && modelsLength > 0 && (
                 <div className="text-center my-5">
                     <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-4 border-blue-400"></div>

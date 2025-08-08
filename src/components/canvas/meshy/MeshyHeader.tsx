@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/MeshyHeader.tsx
 import { X, Bot } from 'lucide-react';
 import { EB_Garamond } from 'next/font/google';
 

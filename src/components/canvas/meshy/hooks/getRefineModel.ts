@@ -1,4 +1,3 @@
-// src/components/canvas/meshy/hooks/getRefineModel.ts
 import { useMutation } from '@tanstack/react-query';
 import { MeshyRefineRequest, Meshy3DObjectResponse } from '../types';
 import axios from 'axios';

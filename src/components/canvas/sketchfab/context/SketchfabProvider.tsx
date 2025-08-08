@@ -1,4 +1,3 @@
-// src/components/canvas/sketchfab/context/SketchfabProvider.tsx
 'use client';
 
 import React, { ReactNode } from 'react';

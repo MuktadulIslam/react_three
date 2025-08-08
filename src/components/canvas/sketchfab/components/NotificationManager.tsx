@@ -1,5 +1,14 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { CheckCircle, X, AlertCircle } from 'lucide-react';
+
+interface NotificationData {
+    id: string;
+    message: string;
+    type: 'success' | 'error' | 'info';
+    duration?: number;
+}
 
 interface NotificationProps {
     message: string;
@@ -8,22 +17,15 @@ interface NotificationProps {
     onClose: () => void;
 }
 
-export default function Notification({
-    message,
-    type,
-    duration = 3000,
-    onClose
-}: NotificationProps) {
+function Notification({ message, type, duration = 3000, onClose }: NotificationProps) {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // Trigger animation
         setIsVisible(true);
 
-        // Auto-close after duration
         const timer = setTimeout(() => {
             setIsVisible(false);
-            setTimeout(onClose, 300); // Wait for exit animation
+            setTimeout(onClose, 300);
         }, duration);
 
         return () => clearTimeout(timer);
@@ -55,9 +57,7 @@ export default function Notification({
 
     return (
         <div
-            className={`fixed top-4 right-4 z-[9999] transition-all duration-300 ${isVisible
-                ? 'translate-x-0 opacity-100'
-                : 'translate-x-full opacity-0'
+            className={`fixed top-4 right-4 z-[9999] transition-all duration-300 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
                 }`}
         >
             <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-md ${getColorClasses()}`}>
@@ -77,23 +77,12 @@ export default function Notification({
     );
 }
 
-// Notification Manager Component
-interface NotificationData {
-    id: string;
-    message: string;
-    type: 'success' | 'error' | 'info';
-    duration?: number;
-}
-
 interface NotificationManagerProps {
     notifications: NotificationData[];
     removeNotification: (id: string) => void;
 }
 
-export function NotificationManager({
-    notifications,
-    removeNotification
-}: NotificationManagerProps) {
+export default function NotificationManager({ notifications, removeNotification }: NotificationManagerProps) {
     return (
         <div className="fixed top-4 right-4 z-[9999] space-y-2">
             {notifications.map((notification) => (
