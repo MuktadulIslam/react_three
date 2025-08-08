@@ -19,7 +19,6 @@ export const useRefineModel = () => {
             return responseData;
         },
         onSuccess: (responseData) => {
-            console.log('Model refinement successful:', responseData);
             return responseData;
         },
         onError: (error) => {

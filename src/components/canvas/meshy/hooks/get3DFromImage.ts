@@ -58,11 +58,6 @@ export const useGet3DFromImage = () => {
             }
         },
         onSuccess: (responseData) => {
-            console.log('Image-to-3D generation successful:', {
-                id: responseData.id,
-                status: responseData.status,
-                hasModelUrls: !!responseData.model_urls
-            });
             return responseData;
         },
         onError: (error) => {

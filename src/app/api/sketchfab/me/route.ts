@@ -7,7 +7,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const accessToken = getAccessTokenFromRequest(request);
 
     if (!accessToken) {
-        console.log('No access token found in cookies');
         return NextResponse.json({ error: 'Access token required' }, { status: 401 });
     }
 
@@ -29,7 +28,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         });
 
         if (axiosError.response?.status === 401) {
-            console.log('Access token expired or invalid');
             return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
         }
         return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 });

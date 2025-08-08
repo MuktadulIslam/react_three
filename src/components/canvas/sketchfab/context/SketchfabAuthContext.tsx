@@ -46,8 +46,6 @@ export function SketchfabAuthProvider({ children }: SketchfabAuthProviderProps) 
 
         try {
             const response = await axios.get('/api/sketchfab/me');
-            console.log("Auth response data: ", response.data);
-
             const userData: UserInfo = {
                 name: response.data.displayName || response.data.username,
                 username: response.data.username,
@@ -59,7 +57,6 @@ export function SketchfabAuthProvider({ children }: SketchfabAuthProviderProps) 
             setAuthenticated(true);
             setError(null);
         } catch (err) {
-            console.log('Authentication failed - no access token');
             setUser(null);
             setAuthenticated(false);
             setError('Authentication required');

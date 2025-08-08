@@ -24,7 +24,5 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         sameSite: 'lax' // Changed from 'strict' to 'lax' for OAuth compatibility
     });
 
-    console.log('Response of: ', response);
-
     return response;
 }

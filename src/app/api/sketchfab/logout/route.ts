@@ -13,7 +13,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         response.cookies.delete(sketchfabToken.accessToken);
         response.cookies.delete(sketchfabToken.refreshToken);
 
-        console.log('User logged out successfully');
         return response;
 
     } catch (error) {

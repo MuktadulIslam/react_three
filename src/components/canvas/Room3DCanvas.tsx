@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense, } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows, useProgress, Html } from '@react-three/drei';
+import { OrbitControls, Environment, } from '@react-three/drei';
 import Room from '@/components/rooms/room1/Room';
 import RoomControls from '@/components/canvas/RoomControls'
 import Sidebar from './sidebar/Sidebar';
@@ -11,7 +11,6 @@ import HtmlLoader from './SuspenseLoader';
 import ObjectControls from './ObjectControls';
 import { MeshProvider, useMeshContext } from './MeshContext';
 import { RoomProvider, useRoomContext } from './RoomDimensionsContext';
-import FullscreenWrapper from '@/app/FullscreenWrapper';
 
 function Room3DCanvasContent() {
     const [controlsVisible, setControlsVisible] = useState<boolean>(true);
@@ -137,12 +136,10 @@ function Room3DCanvasContent() {
 
 export default function Room3DCanvas() {
     return (
-        <FullscreenWrapper>
-            <RoomProvider initialDimensions={{ width: 20, length: 25, height: 5 }}>
-                <MeshProvider>
-                    <Room3DCanvasContent />
-                </MeshProvider>
-            </RoomProvider>
-        </FullscreenWrapper>
+        <RoomProvider initialDimensions={{ width: 20, length: 25, height: 5 }}>
+            <MeshProvider>
+                <Room3DCanvasContent />
+            </MeshProvider>
+        </RoomProvider>
     );
 }

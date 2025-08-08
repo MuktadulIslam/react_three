@@ -63,7 +63,6 @@ export default function Sidebar(
         };
 
         setUploadedFiles(prev => [...prev, sketchfabFile]);
-        console.log('Successfully added Sketchfab model to sidebar:', modelData.name);
     }, []);
 
     // Add Meshy model handler
@@ -74,13 +73,6 @@ export default function Sidebar(
         fileType: 'glb';
         model: Meshy3DObjectResponse;
     }) => {
-        console.log('🤖 Adding Meshy model to sidebar:', {
-            id: modelData.id,
-            name: modelData.name,
-            url: modelData.url ? 'URL created' : 'No URL',
-            fileType: modelData.fileType
-        });
-
         const meshyFile: UploadedFile = {
             id: modelData.id,
             name: modelData.name,
@@ -93,11 +85,9 @@ export default function Sidebar(
 
         setUploadedFiles(prev => {
             const updated = [...prev, meshyFile];
-            console.log('📁 Updated uploaded files count:', updated.length);
             return updated;
         });
         
-        console.log('✅ Successfully added Meshy AI model to sidebar:', modelData.name);
     }, []);
 
     // Convert uploaded files to draggable objects
