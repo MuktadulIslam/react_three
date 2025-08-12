@@ -34,26 +34,17 @@ export default function AddToSidebarButton({
         setIsAdding(true);
 
         try {
-            // Download the GLB file and create a blob URL
-            const response = await fetch(`/api/meshy/model?url=${encodeURIComponent(model.model_urls.glb)}`);
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch model file');
-            }
-
-            const blob = await response.blob();
-            const objectUrl = URL.createObjectURL(blob);
-
-            // Create model data for sidebar
+            // For Meshy models, we'll use the direct Meshy URL
+            // The Dynamic3DModel component will handle the proxy via useMeshyModelUrl hook
             const modelData = {
                 id: `meshy-${model.id}-${Date.now()}`,
                 name: `AI Model ${model.id.slice(0, 8)}`,
-                url: objectUrl,
+                url: model.model_urls.glb, // Use the direct Meshy URL
                 fileType: 'glb' as const,
                 model: model
             };
 
-            // Add to sidebar
+            // Add to sidebar - the Dynamic3DModel will handle the proxy automatically
             onAddToSidebar(modelData);
             setHasBeenAdded(true);
 

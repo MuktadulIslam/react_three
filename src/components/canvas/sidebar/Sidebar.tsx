@@ -1,7 +1,7 @@
-// src/components/canvas/sidebar/Sidebar.tsx (Updated)
+// src/components/canvas/sidebar/Sidebar.tsx (Simplified)
 import { useState, useCallback } from "react"
 import SketchfabSideBar from '../sketchfab/SketchfabSideBar';
-import MeshySideBar from '../meshy/MeshySideBar'; // New import
+import MeshySideBar from '../meshy/MeshySideBar';
 import SidebarHeader from "./SidebarHeader"
 import SidebarGroupedObjects from "./SidebarGroupedObjects"
 import { DraggableObjectGroup, DraggableObjectData } from './types'
@@ -16,9 +16,10 @@ interface UploadedFile {
     url: string;
     fileType: 'glb' | 'fbx';
     uploadDate: Date;
-    source?: 'upload' | 'sketchfab' | 'meshy'; // Updated to include meshy
+    source?: 'upload' | 'sketchfab' | 'meshy';
     sketchfabModel?: SketchfabModel;
-    meshyModel?: Meshy3DObjectResponse; // Add meshy model reference
+    meshyModel?: Meshy3DObjectResponse;
+    isMeshyUrl?: boolean;
 }
 
 export default function Sidebar(
@@ -26,7 +27,7 @@ export default function Sidebar(
         { visible: boolean, onDragStart: (component: React.ReactNode) => void }
 ) {
     const [showSketchfabSearch, setShowSketchfabSearch] = useState<boolean>(false);
-    const [showMeshyGeneration, setShowMeshyGeneration] = useState<boolean>(false); // New state
+    const [showMeshyGeneration, setShowMeshyGeneration] = useState<boolean>(false);
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
 
     const handleFileUpload = useCallback((file: File) => {
@@ -65,7 +66,7 @@ export default function Sidebar(
         setUploadedFiles(prev => [...prev, sketchfabFile]);
     }, []);
 
-    // Add Meshy model handler
+    // Updated Meshy model handler - now handles direct Meshy URLs
     const handleMeshyModelAdd = useCallback((modelData: {
         id: string;
         name: string;
@@ -76,24 +77,27 @@ export default function Sidebar(
         const meshyFile: UploadedFile = {
             id: modelData.id,
             name: modelData.name,
-            url: modelData.url,
+            url: modelData.url, // This can be either a blob URL or direct Meshy URL
             fileType: modelData.fileType,
             uploadDate: new Date(),
             source: 'meshy',
-            meshyModel: modelData.model
+            meshyModel: modelData.model,
+            isMeshyUrl: modelData.url.includes('assets.meshy.ai') // Auto-detect Meshy URLs
         };
 
-        setUploadedFiles(prev => {
-            const updated = [...prev, meshyFile];
-            return updated;
-        });
-        
+        setUploadedFiles(prev => [...prev, meshyFile]);
     }, []);
 
     // Convert uploaded files to draggable objects
     const uploadedObjects: DraggableObjectData[] = uploadedFiles.map(file => ({
         id: file.id,
-        component: <Dynamic3DModel url={file.url} fileType={file.fileType} />,
+        component: (
+            <Dynamic3DModel 
+                url={file.url} 
+                fileType={file.fileType}
+                isMeshyUrl={file.isMeshyUrl}
+            />
+        ),
         name: file.name,
         icon: file.source === 'sketchfab' ? '🌐' :
             file.source === 'meshy' ? '🤖' :
@@ -190,6 +194,9 @@ export default function Sidebar(
                     {uploadedFiles.length > 0 && (
                         <div className="w-full text-center text-xs text-gray-500 mt-1">
                             📦 {uploadedFiles.length} model{uploadedFiles.length !== 1 ? 's' : ''} loaded
+                            {meshyObjects.length > 0 && (
+                                <span className="text-purple-400"> ({meshyObjects.length} AI generated)</span>
+                            )}
                         </div>
                     )}
                 </div>
