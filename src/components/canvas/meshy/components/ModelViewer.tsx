@@ -6,6 +6,7 @@ import { OrbitControls, useGLTF, Environment, Html } from '@react-three/drei';
 import { LuRotate3D } from "react-icons/lu";
 import { RotateCcw, Maximize2, Minimize2 } from 'lucide-react';
 import { Meshy3DObjectResponse } from '../types';
+import MeshyModel from './MeshyModel';
 
 interface ModelViewerProps {
     modelUrl: string | undefined;
@@ -13,12 +14,6 @@ interface ModelViewerProps {
     showControls?: boolean;
     showPreview?: boolean;
     hideHeader?: boolean;
-}
-
-function Model({ url }: { url: string }) {
-    const proxyUrl = `/api/meshy/model?url=${encodeURIComponent(url)}`;
-    const { scene } = useGLTF(proxyUrl);
-    return <primitive object={scene} scale={1} />;
 }
 
 function LoadingSpinner() {
@@ -132,7 +127,7 @@ export function ModelViewer({ modelUrl, modelData, showControls = true, showPrev
                         <directionalLight position={[-10, -10, -5]} intensity={0.3} />
 
                         <Suspense fallback={<LoadingSpinner />}>
-                            <Model url={modelUrl} />
+                            <MeshyModel url={modelUrl} />
                             <Environment preset="studio" />
                         </Suspense>
 
