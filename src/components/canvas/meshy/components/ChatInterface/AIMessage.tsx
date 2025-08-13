@@ -134,7 +134,7 @@ export default function AIMessage({ message, onAddToSidebar }: AIMessageProps) {
                             {needsRefinement(message.modelData) && (
                                 <div className="flex items-center gap-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2 py-1">
                                     <Sparkles size={12} />
-                                    <span>This model has no textures. Click "Refine Model" to add realistic materials and textures.</span>
+                                    <span>{`This model has no textures. Click "Refine Model" to add realistic materials and textures.`}</span>
                                 </div>
                             )}
                         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Image, X, Settings } from 'lucide-react';
+import { Send, Image as ImageIcon, X, Settings } from 'lucide-react';
 import { useMeshyChat } from '../../../context/MeshyChatContext';
 import { GenerationType, MeshyTextTo3DRequest, MeshyImageTo3DRequest, MeshyRefineRequest, MeshyModelVersion, } from '../../../types';
 import AdvancedSettings from './AdvancedSettings';
@@ -238,7 +238,7 @@ export default function InputArea() {
                                 title={`Upload Images (${currentImages.length}/4)`}
                                 disabled={currentImages.length >= 4}
                             >
-                                <Image size={20} />
+                                <ImageIcon size={20} />
                             </button>
                         )}
 

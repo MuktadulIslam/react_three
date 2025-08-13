@@ -1,5 +1,6 @@
-import { Image, X, Sparkles } from 'lucide-react';
+import { Image as ImageIcon, X, Sparkles } from 'lucide-react';
 import { useMeshyChat } from "../../../context/MeshyChatContext";
+import Image from 'next/image';
 
 interface ImagePreviewProps {
     fileInputRef: React.RefObject<HTMLInputElement | null>;
@@ -23,19 +24,13 @@ export default function ImagePreview({ fileInputRef }: ImagePreviewProps) {
                 {currentRefineModelData && (
                     <div className="relative inline-block">
                         <div className="relative">
-                            <img
+                            <Image
+                            width={100}
+                            height={100}
                                 src={currentRefineModelData.model_thumbnail_url}
                                 alt="Model to refine"
                                 className="w-16 h-16 object-cover rounded-lg border border-purple-400 bg-gray-800"
                             />
-                            {/* Model indicator overlay */}
-                            <div className="absolute inset-0 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                                <Sparkles size={12} className="text-purple-300" />
-                            </div>
-                            {/* Model label */}
-                            <div className="absolute -bottom-1 left-0 right-0 bg-purple-500 text-white text-[8px] text-center rounded-b-lg px-1">
-                                3D MODEL
-                            </div>
                         </div>
                         <button
                             onClick={() => setCurrentRefineModelData(null)}
@@ -49,7 +44,9 @@ export default function ImagePreview({ fileInputRef }: ImagePreviewProps) {
 
                 {currentImages.map((image, index) => (
                     <div key={index} className="relative inline-block">
-                        <img
+                        <Image
+                            width={100}
+                            height={100}
                             src={image}
                             alt={`Upload preview ${index + 1}`}
                             className="w-16 h-16 object-cover rounded-lg border border-white/20"
@@ -69,7 +66,7 @@ export default function ImagePreview({ fileInputRef }: ImagePreviewProps) {
                         onClick={() => fileInputRef.current?.click()}
                         className="w-16 h-16 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-colors"
                     >
-                        <Image size={20} />
+                        <ImageIcon size={20} />
                     </button>
                 )}
             </div>

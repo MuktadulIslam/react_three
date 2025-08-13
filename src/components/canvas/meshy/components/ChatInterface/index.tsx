@@ -36,7 +36,7 @@ export default function ChatInterface({ onAddModelToSidebar }: ChatInterfaceProp
         if (messages.length === 0) {
             startNewSession(currentGenerationType.value);
         }
-    }, [currentGenerationType.value]);
+    }, [currentGenerationType.value, messages.length, startNewSession]);
 
 
 

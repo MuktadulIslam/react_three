@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Mesh } from 'three';
 import { SelectableObject } from './types';
 import * as THREE from 'three'
@@ -15,6 +15,10 @@ export default function ObjectControls() {
   const MAX_SCALE = 4;
   const MIN_SCALE = 0.1;
   const rotationStepSize = 10
+
+  const handleClose = useCallback(() => {
+    clearObject(); // This will handle both Three.js removal and state update
+  }, [clearObject]);
 
   // Initialize state from selectedObject properties
   useEffect(() => {
@@ -42,11 +46,8 @@ export default function ObjectControls() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [handleClose]);
 
-  const handleClose = () => {
-    clearObject(); // This will handle both Three.js removal and state update
-  };
 
   const updateObjectPosition = () => {
     if (!selectedObject) return;

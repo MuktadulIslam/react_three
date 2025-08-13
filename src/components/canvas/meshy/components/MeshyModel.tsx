@@ -1,6 +1,7 @@
 import { useGLTF, Html } from '@react-three/drei';
 import { useMeshyModelUrl } from '../hooks/useMeshyModelUrl';
-import { Suspense } from 'react';
+import { useModelCache } from '../hooks/useModelCache';
+import { Suspense, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 // Loading component for when the model is being fetched
@@ -27,17 +28,34 @@ function ModelErrorFallback() {
     );
 }
 
-// Separate component for the actual GLTF loading
-function GLTFModel({ blobUrl }: { blobUrl: string }) {
-    // Remove try-catch - let React's error boundary handle errors
+// Cached GLTF component that uses the cache
+function CachedGLTFModel({ meshyUrl, blobUrl }: { meshyUrl: string; blobUrl: string }) {
+    const { setCachedModel } = useModelCache();
     const { scene } = useGLTF(blobUrl);
+    useMemo(() => {
+        if (scene) {
+            setCachedModel(meshyUrl, scene);
+        }
+    }, [scene, meshyUrl, setCachedModel]);
+
     return <primitive object={scene} scale={1} />;
 }
 
-// Updated Model component with comprehensive error handling
+// Updated Model component with comprehensive caching
 export default function MeshyModel({ url }: { url: string }) {
-    // Use the hook to get the blob URL
+    const { getCachedModel } = useModelCache();
+    // Move ALL hooks to the top level - they must always be called
     const { data: blobUrl, isLoading, isError } = useMeshyModelUrl(url);
+    
+    const cachedModel = useMemo(() => {
+        return getCachedModel(url);
+    }, [url, getCachedModel]);
+
+    // Now handle the conditional logic AFTER all hooks are called
+    if (cachedModel) {
+        const clonedScene = cachedModel.scene.clone();
+        return <primitive object={clonedScene} scale={1} />;
+    }
 
     if (isLoading) return <ModelLoadingFallback />;
     if (isError) return <ModelErrorFallback />;
@@ -52,7 +70,7 @@ export default function MeshyModel({ url }: { url: string }) {
             }}
         >
             <Suspense fallback={<ModelLoadingFallback />}>
-                <GLTFModel blobUrl={blobUrl} />
+                <CachedGLTFModel meshyUrl={url} blobUrl={blobUrl} />
             </Suspense>
         </ErrorBoundary>
     );

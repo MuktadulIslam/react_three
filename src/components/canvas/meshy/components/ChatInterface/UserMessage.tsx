@@ -3,6 +3,7 @@
 import React, { useCallback } from 'react';
 import { User, Sparkles, Eye, RefreshCw } from 'lucide-react';
 import { ChatMessage as ChatMessageType } from '../../types';
+import Image from 'next/image';
 
 interface UserMessageProps {
     message: ChatMessageType;
@@ -44,20 +45,18 @@ export default function UserMessage({ message }: UserMessageProps) {
     };
 
     const modelImageComponent = useCallback((image_url: string | null) => {
-        if(image_url == null) return <></>;
+        if (image_url == null) return <></>;
         return (
             <div className="relative inline-block">
-                <img
+                <Image
+                    width={100}
+                    height={100}
                     src={image_url}
                     alt="Model to refine"
                     className="w-32 h-32 object-cover rounded-lg border border-purple-400 bg-gray-800"
                 />
-                {/* Model indicator overlay */}
-                <div className="absolute inset-0 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                    <Sparkles size={12} className="text-purple-300" />
-                </div>
                 {/* Model label */}
-                <div className="absolute bottom-0 left-0 right-0 bg-purple-500 text-white text-[8px] text-center rounded-b-lg px-1">
+                <div className="absolute bottom-0 left-0 right-0 bg-purple-400 text-white text-[8px] text-center rounded-b-lg px-1">
                     3D MODEL
                 </div>
             </div>
@@ -92,13 +91,15 @@ export default function UserMessage({ message }: UserMessageProps) {
                     )}
 
                     {/* Multi-Image Preview for user messages */}
-                    {displayImages.length > 0 && (
+                    {displayImages.length > 0 || message.refineModelData?.model_thumbnail_url != null && (
                         <div className="mb-2">
                             <div className="grid grid-cols-2 gap-2 max-w-full">
                                 {modelImageComponent(message.refineModelData?.model_thumbnail_url ?? null)}
                                 {displayImages.map((imageUrl, index) => (
                                     <div key={index} className="relative">
-                                        <img
+                                        <Image
+                                            width={100}
+                                            height={100}
                                             src={imageUrl}
                                             alt={`User uploaded image ${index + 1}`}
                                             className="w-full h-32 object-cover rounded-lg border border-white/20"
