@@ -91,7 +91,7 @@ export default function UserMessage({ message }: UserMessageProps) {
                     )}
 
                     {/* Multi-Image Preview for user messages */}
-                    {displayImages.length > 0 || message.refineModelData?.model_thumbnail_url != null && (
+                    {(displayImages.length > 0 || message.refineModelData?.model_thumbnail_url != null) && (
                         <div className="mb-2">
                             <div className="grid grid-cols-2 gap-2 max-w-full">
                                 {modelImageComponent(message.refineModelData?.model_thumbnail_url ?? null)}

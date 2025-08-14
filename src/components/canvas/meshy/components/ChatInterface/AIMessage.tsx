@@ -5,6 +5,7 @@ import { ChatMessage as ChatMessageType, Meshy3DObjectResponse } from '../../typ
 import AddToSidebarButton from '../AddToSidebarButton';
 import { ModelViewer } from '../ModelViewer';
 import { useMeshyChat } from '../../context/MeshyChatContext';
+import { useState } from 'react';
 
 interface AIMessageProps {
     message: ChatMessageType;
@@ -19,6 +20,7 @@ interface AIMessageProps {
 
 export default function AIMessage({ message, onAddToSidebar }: AIMessageProps) {
     const { current3DModel, setCurrentRefineModelData } = useMeshyChat();
+    const [isError, setIsError] = useState<boolean>(false);
 
     const handleDownload = (model: Meshy3DObjectResponse, format: 'glb' | 'fbx' | 'obj') => {
         const url = model.model_urls?.[format];
@@ -75,67 +77,72 @@ export default function AIMessage({ message, onAddToSidebar }: AIMessageProps) {
                                 modelUrl={message.modelData.model_urls?.glb ?? ''}
                                 modelData={current3DModel || undefined}
                                 showControls={true}
+                                setIsError={setIsError}
                             />
 
-                            {/* Model Actions */}
-                            <div className="flex flex-wrap gap-2">
-                                <AddToSidebarButton
-                                    model={message.modelData}
-                                    onAddToSidebar={onAddToSidebar}
-                                />
+                            {!isError && (
+                                <>
+                                    {/* Model Actions */}
+                                    <div className="flex flex-wrap gap-2">
+                                        <AddToSidebarButton
+                                            model={message.modelData}
+                                            onAddToSidebar={onAddToSidebar}
+                                        />
 
-                                {/* Refine Button - only show if model needs refinement */}
-                                {needsRefinement(message.modelData) && (
-                                    <button
-                                        onClick={() => setCurrentRefineModelData({
-                                            model_thumbnail_url:message.modelData?.thumbnail_url ?? '',
-                                            preview_task_id: message.modelData?.id ?? ''
-                                        })}
-                                        className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg text-sm transition-colors"
-                                        title="Add textures and materials to this model"
-                                    >
-                                        <Sparkles size={12} />
-                                        Refine Model
-                                    </button>
-                                )}
+                                        {/* Refine Button - only show if model needs refinement */}
+                                        {needsRefinement(message.modelData) && (
+                                            <button
+                                                onClick={() => setCurrentRefineModelData({
+                                                    model_thumbnail_url: message.modelData?.thumbnail_url ?? '',
+                                                    preview_task_id: message.modelData?.id ?? ''
+                                                })}
+                                                className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg text-sm transition-colors"
+                                                title="Add textures and materials to this model"
+                                            >
+                                                <Sparkles size={12} />
+                                                Refine Model
+                                            </button>
+                                        )}
 
-                                {message.modelData.model_urls?.glb && (
-                                    <button
-                                        onClick={() => handleDownload(message.modelData!, 'glb')}
-                                        className="flex items-center gap-1 px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded-lg text-sm transition-colors"
-                                    >
-                                        <Download size={12} />
-                                        GLB
-                                    </button>
-                                )}
+                                        {message.modelData.model_urls?.glb && (
+                                            <button
+                                                onClick={() => handleDownload(message.modelData!, 'glb')}
+                                                className="flex items-center gap-1 px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded-lg text-sm transition-colors"
+                                            >
+                                                <Download size={12} />
+                                                GLB
+                                            </button>
+                                        )}
 
-                                {message.modelData.model_urls?.fbx && (
-                                    <button
-                                        onClick={() => handleDownload(message.modelData!, 'fbx')}
-                                        className="flex items-center gap-1 px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded-lg text-sm transition-colors"
-                                    >
-                                        <Download size={12} />
-                                        FBX
-                                    </button>
-                                )}
+                                        {message.modelData.model_urls?.fbx && (
+                                            <button
+                                                onClick={() => handleDownload(message.modelData!, 'fbx')}
+                                                className="flex items-center gap-1 px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded-lg text-sm transition-colors"
+                                            >
+                                                <Download size={12} />
+                                                FBX
+                                            </button>
+                                        )}
 
-                                {message.modelData.model_urls?.obj && (
-                                    <button
-                                        onClick={() => handleDownload(message.modelData!, 'obj')}
-                                        className="flex items-center gap-1 px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded-lg text-sm transition-colors"
-                                    >
-                                        <Download size={12} />
-                                        OBJ
-                                    </button>
-                                )}
-                            </div>
+                                        {message.modelData.model_urls?.obj && (
+                                            <button
+                                                onClick={() => handleDownload(message.modelData!, 'obj')}
+                                                className="flex items-center gap-1 px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded-lg text-sm transition-colors"
+                                            >
+                                                <Download size={12} />
+                                                OBJ
+                                            </button>
+                                        )}
+                                    </div>
 
-                            {/* Refinement Status Indicator */}
-                            {needsRefinement(message.modelData) && (
-                                <div className="flex items-center gap-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2 py-1">
-                                    <Sparkles size={12} />
-                                    <span>{`This model has no textures. Click "Refine Model" to add realistic materials and textures.`}</span>
-                                </div>
+                                    {/* Refinement Status Indicator */}
+                                    {needsRefinement(message.modelData) && (
+                                        <div className="flex items-center gap-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2 py-1">
+                                            <Sparkles size={12} />
+                                            <span>{`This model has no textures. Click "Refine Model" to add realistic materials and textures.`}</span>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                     )}

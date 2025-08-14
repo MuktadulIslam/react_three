@@ -12,6 +12,7 @@ interface ModelComparisonProps {
 
 export default function ModelComparison({ models, onClose }: ModelComparisonProps) {
     const [selectedModels, setSelectedModels] = useState<[number, number]>([0, Math.min(1, models.length - 1)]);
+    const [isError, setIsError] = useState<boolean>(false);
 
     const handleDownload = (model: Meshy3DObjectResponse, format: 'glb' | 'fbx' | 'obj') => {
         const url = model.model_urls?.[format];
@@ -89,8 +90,8 @@ export default function ModelComparison({ models, onClose }: ModelComparisonProp
                             <h3 className="text-white font-medium">
                                 Model {selectedModels[0] + 1}
                             </h3>
-                            <div className="flex gap-1">
-                                {models[selectedModels[0]].model_urls?.glb && (
+                            {!isError && models[selectedModels[0]].model_urls?.glb && (
+                                <div className="flex gap-1">
                                     <button
                                         onClick={() => handleDownload(models[selectedModels[0]], 'glb')}
                                         className="p-1.5 text-green-400 hover:bg-green-500/20 rounded text-xs"
@@ -98,13 +99,14 @@ export default function ModelComparison({ models, onClose }: ModelComparisonProp
                                     >
                                         <Download size={12} />
                                     </button>
-                                )}
-                            </div>
+                                </div>
+                            )}
                         </div>
                         <ModelViewer
                             modelUrl={models[selectedModels[0]].model_urls?.glb ?? ''}
                             modelData={models[selectedModels[0]]}
                             showPreview={false}
+                            setIsError={setIsError}
                         />
                     </div>
 
@@ -114,8 +116,8 @@ export default function ModelComparison({ models, onClose }: ModelComparisonProp
                             <h3 className="text-white font-medium">
                                 Model {selectedModels[1] + 1}
                             </h3>
-                            <div className="flex gap-1">
-                                {models[selectedModels[1]].model_urls?.glb && (
+                            {!isError && models[selectedModels[1]].model_urls?.glb && (
+                                <div className="flex gap-1">
                                     <button
                                         onClick={() => handleDownload(models[selectedModels[1]], 'glb')}
                                         className="p-1.5 text-green-400 hover:bg-green-500/20 rounded text-xs"
@@ -123,13 +125,14 @@ export default function ModelComparison({ models, onClose }: ModelComparisonProp
                                     >
                                         <Download size={12} />
                                     </button>
-                                )}
-                            </div>
+                                </div>
+                            )}
                         </div>
                         <ModelViewer
                             modelUrl={models[selectedModels[1]].model_urls?.glb ?? ''}
                             modelData={models[selectedModels[1]]}
                             showPreview={false}
+                            setIsError={setIsError}
                         />
                     </div>
                 </div>

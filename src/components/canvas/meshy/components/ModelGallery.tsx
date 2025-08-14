@@ -14,6 +14,7 @@ interface ModelGalleryProps {
 
 export default function ModelGallery({ models, onClose, onSelectModel, onCompare }: ModelGalleryProps) {
     const [selectedModels, setSelectedModels] = useState<Set<string>>(new Set());
+    const [isError, setIsError] = useState<boolean>(false);
 
     const handleModelSelect = (modelId: string) => {
         const newSelected = new Set(selectedModels);
@@ -123,7 +124,11 @@ export default function ModelGallery({ models, onClose, onSelectModel, onCompare
                         >
                             {/* Model Viewer */}
                             <div className="relative">
-                                <ModelViewer modelUrl={model.model_urls?.glb} hideHeader={true} />
+                                <ModelViewer
+                                    modelUrl={model.model_urls?.glb}
+                                    hideHeader={true}
+                                    setIsError={setIsError}
+                                />
 
                                 {/* Selection Checkbox */}
                                 <button
@@ -163,25 +168,27 @@ export default function ModelGallery({ models, onClose, onSelectModel, onCompare
                                 )}
 
                                 {/* Actions */}
-                                <div className="flex gap-1">
-                                    <button
-                                        onClick={() => onSelectModel(model)}
-                                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 rounded text-xs transition-colors"
-                                    >
-                                        <Eye size={10} />
-                                        View
-                                    </button>
-
-                                    {model.model_urls?.glb && (
+                                {!isError &&
+                                    <div className="flex gap-1">
                                         <button
-                                            onClick={() => handleDownload(model, 'glb')}
-                                            className="px-2 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded text-xs transition-colors"
-                                            title="Download GLB"
+                                            onClick={() => onSelectModel(model)}
+                                            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 rounded text-xs transition-colors"
                                         >
-                                            <Download size={10} />
+                                            <Eye size={10} />
+                                            View
                                         </button>
-                                    )}
-                                </div>
+
+                                        {model.model_urls?.glb && (
+                                            <button
+                                                onClick={() => handleDownload(model, 'glb')}
+                                                className="px-2 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded text-xs transition-colors"
+                                                title="Download GLB"
+                                            >
+                                                <Download size={10} />
+                                            </button>
+                                        )}
+                                    </div>
+                                }
                             </div>
                         </div>
                     ))}

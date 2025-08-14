@@ -41,12 +41,17 @@ function CachedGLTFModel({ meshyUrl, blobUrl }: { meshyUrl: string; blobUrl: str
     return <primitive object={scene} scale={1} />;
 }
 
+interface MeshyModelProps {
+    url: string;
+    setIsError: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 // Updated Model component with comprehensive caching
-export default function MeshyModel({ url }: { url: string }) {
+export default function MeshyModel({ url, setIsError }: MeshyModelProps) {
     const { getCachedModel } = useModelCache();
     // Move ALL hooks to the top level - they must always be called
-    const { data: blobUrl, isLoading, isError } = useMeshyModelUrl(url);
-    
+    const { data: blobUrl, isLoading } = useMeshyModelUrl(url);
+
     const cachedModel = useMemo(() => {
         return getCachedModel(url);
     }, [url, getCachedModel]);
@@ -58,14 +63,14 @@ export default function MeshyModel({ url }: { url: string }) {
     }
 
     if (isLoading) return <ModelLoadingFallback />;
-    if (isError) return <ModelErrorFallback />;
     if (!blobUrl) return <ModelLoadingFallback />;
 
     // Wrap the GLTF component in error boundary and suspense
     return (
         <ErrorBoundary
-            fallbackRender={() => <ModelErrorFallback/>}
+            fallbackRender={() => <ModelErrorFallback />}
             onError={(error) => {
+                setIsError(true);
                 console.error('GLTF Model Error:', error);
             }}
         >

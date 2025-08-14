@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, useGLTF, Environment, Html } from '@react-three/drei';
+import { OrbitControls, Environment, Html } from '@react-three/drei';
 import { LuRotate3D } from "react-icons/lu";
 import { RotateCcw, Maximize2, Minimize2 } from 'lucide-react';
 import { Meshy3DObjectResponse } from '../types';
@@ -10,6 +10,7 @@ import MeshyModel from './MeshyModel';
 
 interface ModelViewerProps {
     modelUrl: string | undefined;
+    setIsError: React.Dispatch<React.SetStateAction<boolean>>
     modelData?: Meshy3DObjectResponse;
     showControls?: boolean;
     showPreview?: boolean;
@@ -26,7 +27,7 @@ function LoadingSpinner() {
     );
 }
 
-export function ModelViewer({ modelUrl, modelData, showControls = true, showPreview = true, hideHeader = false }: ModelViewerProps) {
+export function ModelViewer({ modelUrl, modelData, showControls = true, showPreview = true, hideHeader = false, setIsError }: ModelViewerProps) {
     const [resetKey, setResetKey] = useState(0);
     const [autoRotate, setAutoRotate] = useState(false);
     const [isExpanded, setExpanded] = useState(false);
@@ -127,7 +128,7 @@ export function ModelViewer({ modelUrl, modelData, showControls = true, showPrev
                         <directionalLight position={[-10, -10, -5]} intensity={0.3} />
 
                         <Suspense fallback={<LoadingSpinner />}>
-                            <MeshyModel url={modelUrl} />
+                            <MeshyModel url={modelUrl} setIsError={setIsError} />
                             <Environment preset="studio" />
                         </Suspense>
 
