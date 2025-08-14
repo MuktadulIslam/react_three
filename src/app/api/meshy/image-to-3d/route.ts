@@ -26,8 +26,8 @@ export async function POST(request: NextRequest) {
         const taskId = response.data.result;
 
         let attempts = 0;
-        const maxAttempts = 30;
-        const pollInterval = 10000;
+        const maxAttempts = 120;
+        const pollInterval = 5000;
 
         while (attempts < maxAttempts) {
             await new Promise(resolve => setTimeout(resolve, pollInterval));

@@ -43,7 +43,7 @@ function CachedGLTFModel({ meshyUrl, blobUrl }: { meshyUrl: string; blobUrl: str
 
 interface MeshyModelProps {
     url: string;
-    setIsError: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsError?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Updated Model component with comprehensive caching
@@ -70,7 +70,7 @@ export default function MeshyModel({ url, setIsError }: MeshyModelProps) {
         <ErrorBoundary
             fallbackRender={() => <ModelErrorFallback />}
             onError={(error) => {
-                setIsError(true);
+                if (setIsError != null) setIsError(true);
                 console.error('GLTF Model Error:', error);
             }}
         >
