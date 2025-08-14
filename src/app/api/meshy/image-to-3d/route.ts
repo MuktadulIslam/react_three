@@ -25,10 +25,9 @@ export async function POST(request: NextRequest) {
         const response = await meshyAxiosInstance.post(meshyAPIConfig.endpoints.imageTo3D, payload);
         const taskId = response.data.result;
 
-        // Poll for completion (simple polling approach 5 times in 5s interval)
         let attempts = 0;
-        const maxAttempts = 5;
-        const pollInterval = 5000;
+        const maxAttempts = 30;
+        const pollInterval = 10000;
 
         while (attempts < maxAttempts) {
             await new Promise(resolve => setTimeout(resolve, pollInterval));
