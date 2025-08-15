@@ -1,7 +1,7 @@
 'use client'
 import { useGLTF } from '@react-three/drei'
 import { useMemo } from 'react'
-import ScaledModelWrapper from '@/components/canvas/ScaledModelWrapper'
+import ScaledModelWrapper from '../canvas/components/ScaledModelWrapper'
 
 export default function ChildrenTableModel() {
     const { scene } = useGLTF('./children_table.glb')

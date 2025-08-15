@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Mesh } from 'three';
-import { SelectableObject } from './types';
 import * as THREE from 'three'
 import { FaRotateLeft, FaRotateRight } from "react-icons/fa6";
-import { useMeshContext } from './MeshContext';
+import { useMeshContext } from '../context/MeshContext';
 
 export default function ObjectControls() {
-  const { selectedObject, selectedObjectId, isObjectControlsVisible, removeObject, clearObject, fixedRingRadius } = useMeshContext();
+  const { selectedObject, selectedObjectId, removeObject, clearObject, fixedRingRadius } = useMeshContext();
   const [scale, setScale] = useState<[number, number, number]>([1, 1, 1]);
   const [rotation, setRotation] = useState<[number, number, number]>([0, 0, 0]);
   const [uniformScale, setUniformScale] = useState<number>(1);

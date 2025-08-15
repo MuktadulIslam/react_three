@@ -1,4 +1,3 @@
-// src/components/canvas/sidebar/Sidebar.tsx (Simplified)
 import { useState, useCallback } from "react"
 import SketchfabSideBar from '../sketchfab/SketchfabSideBar';
 import MeshySideBar from '../meshy/MeshySideBar';

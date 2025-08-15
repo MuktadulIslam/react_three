@@ -1,5 +1,6 @@
+// 'use server'
 import axios from 'axios';
-import { meshyAPIConfig } from '../../../components/canvas/meshy/config/index';
+import { meshyAPIConfig } from './apiConfig';
 
 // Create unprotected axios instance - will not check for tokens
 const meshyAxiosInstance = axios.create({

@@ -10,6 +10,7 @@ import MeshyModel from './MeshyModel';
 
 interface ModelViewerProps {
     modelUrl: string | undefined;
+    className?: string;
     setIsError: React.Dispatch<React.SetStateAction<boolean>>
     modelData?: Meshy3DObjectResponse;
     showControls?: boolean;
@@ -27,7 +28,7 @@ function LoadingSpinner() {
     );
 }
 
-export function ModelViewer({ modelUrl, modelData, showControls = true, showPreview = true, hideHeader = false, setIsError }: ModelViewerProps) {
+export function ModelViewer({ modelUrl, modelData, showControls = true, showPreview = true, hideHeader = false, setIsError, className }: ModelViewerProps) {
     const [resetKey, setResetKey] = useState(0);
     const [autoRotate, setAutoRotate] = useState(false);
     const [isExpanded, setExpanded] = useState(false);
@@ -54,7 +55,7 @@ export function ModelViewer({ modelUrl, modelData, showControls = true, showPrev
 
     return (
         <>
-            <div className="h-[450px] w-full flex flex-col relative bg-gray-800/60 backdrop-blur-md rounded-lg overflow-hidden">
+            <div className={`${className ? className : 'h-[450px] w-full'} flex flex-col relative bg-gray-800/60 backdrop-blur-md rounded-lg overflow-hidden`}>
 
                 {!hideHeader &&
                     <div className="w-full h-auto flex gap-1 items-center justify-between text-sky-400 py-1 px-2">

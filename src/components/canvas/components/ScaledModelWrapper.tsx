@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import * as THREE from 'three';
-import { useRoomContext } from './RoomDimensionsContext';
+import { useRoomContext } from '../context/RoomDimensionsContext';
 
 interface ScaledModelWrapperProps {
     children: React.ReactNode;

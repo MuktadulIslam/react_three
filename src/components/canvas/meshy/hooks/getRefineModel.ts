@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { MeshyRefineRequest, Meshy3DObjectResponse } from '../types';
 import axios from 'axios';
+import { meshyAPIs } from '../config';
 
 export const useRefineModel = () => {
     return useMutation({
@@ -12,7 +13,7 @@ export const useRefineModel = () => {
             const payload = { ...data }
 
             const { data: responseData } = await axios.post(
-                '/api/meshy/refine',
+                meshyAPIs.refineTextTo3D,
                 JSON.stringify(payload),
                 { headers: { 'Content-Type': 'application/json', } }
             );

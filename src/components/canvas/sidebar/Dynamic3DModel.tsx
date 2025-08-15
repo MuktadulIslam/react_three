@@ -1,7 +1,7 @@
 'use client'
 import { useGLTF, useFBX } from '@react-three/drei'
 import { useMemo } from 'react'
-import ScaledModelWrapper from '../ScaledModelWrapper'
+import ScaledModelWrapper from '../components/ScaledModelWrapper'
 import MeshyModel from '../meshy/components/MeshyModel'
 
 interface Dynamic3DModelProps {

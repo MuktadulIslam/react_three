@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { SelectableObject, PlacedObject } from './types';
+import { SelectableObject, PlacedObject } from '../types';
 
 interface MeshContextType {
   // Objects management

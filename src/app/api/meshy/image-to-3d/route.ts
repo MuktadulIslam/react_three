@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { meshyAPIConfig } from '@/components/canvas/meshy/config';
-import meshyAxiosInstance from '../axios-config';
+import { meshyAPIConfig } from '@/components/canvas/meshy/config/apiConfig';
+import meshyAxiosInstance from '../../../../components/canvas/meshy/config/axios-config';
 
 export async function POST(request: NextRequest) {
     try {

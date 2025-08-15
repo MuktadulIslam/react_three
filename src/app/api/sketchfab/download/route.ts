@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios, { AxiosError } from 'axios';
 import { getAccessTokenFromRequest } from '@/components/canvas/sketchfab/utils/authToken';
-import { downloadAPIConfig as config } from '@/components/canvas/sketchfab/config';
+import { downloadAPIConfig as config } from '@/components/canvas/sketchfab/config/apiConfig';
 
 interface RequestBody {
     modelUid: string;

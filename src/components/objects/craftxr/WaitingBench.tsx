@@ -1,7 +1,7 @@
 'use client'
 import { useFBX } from '@react-three/drei'
 import { useMemo } from 'react'
-import ScaledModelWrapper from '../../canvas/ScaledModelWrapper'
+import ScaledModelWrapper from '../../canvas/components/ScaledModelWrapper'
 
 export default function WaitingBench() {
     const fbx = useFBX('./xr_3dmodels/waiting_bench.fbx')

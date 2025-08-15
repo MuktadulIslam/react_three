@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import ScaledModelWrapper from '../canvas/ScaledModelWrapper';
+import ScaledModelWrapper from '../canvas/components/ScaledModelWrapper';
 
 export default function Car({ color = 'red', isHovered = false }: { color?: string, isHovered?: boolean }) {
     const materialColor = isHovered ? new THREE.Color(color).multiplyScalar(1.5) : color

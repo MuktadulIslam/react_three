@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { MeshyImageTo3DRequest, Meshy3DObjectResponse } from '../types';
 import axios from 'axios';
+import { meshyAPIs } from '../config';
 
 export const useGet3DFromImage = () => {
     return useMutation({
@@ -29,7 +30,7 @@ export const useGet3DFromImage = () => {
                 };
 
                 const { data: responseData } = await axios.post(
-                    '/api/meshy/image-to-3d',
+                    meshyAPIs.imageTo3D,
                     payload,
                     {
                         headers: {

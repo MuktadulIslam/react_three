@@ -128,6 +128,7 @@ export default function ModelGallery({ models, onClose, onSelectModel, onCompare
                                     modelUrl={model.model_urls?.glb}
                                     hideHeader={true}
                                     setIsError={setIsError}
+                                    className={'h-[250px] w-full'}
                                 />
 
                                 {/* Selection Checkbox */}

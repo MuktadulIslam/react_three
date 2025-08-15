@@ -9,6 +9,7 @@ import { useGet3DFromText } from '../../../hooks/get3DFromText';
 import { useGet3DFromImage } from '../../../hooks/get3DFromImage';
 import { useRefineModel } from '../../../hooks/getRefineModel';
 import ImagePreview from './ImagePreview';
+import ChatInput from './ChatInput';
 
 export default function InputArea() {
     const {
@@ -131,8 +132,6 @@ export default function InputArea() {
         });
 
         setIsGenerating(true);
-        setCurrentInput('');
-
         try {
             let result;
 
@@ -191,12 +190,6 @@ export default function InputArea() {
         }
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit();
-        }
-    };
 
     const getPlaceholder = () => {
         switch (currentGenerationType.value) {
@@ -217,15 +210,13 @@ export default function InputArea() {
         <div className="w-full h-auto p-2 border-t border-white/10">
             <ImagePreview fileInputRef={fileInputRef} />
 
-            <div className="w-full flex flex-col min-h-20 max-h-60 bg-white/10 border border-white/20 rounded-xl backdrop-blur-sm">
-                <textarea
-                    value={currentInput}
-                    onChange={(e) => setCurrentInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
+            <div className="w-full flex flex-col min-h-20 max-h-96 bg-white/10 border border-white/20 rounded-xl backdrop-blur-sm">
+                <ChatInput
+                    onSendMessage={handleSubmit}
                     placeholder={getPlaceholder()}
-                    className="w-full flex-1 px-3 py-3 text-white placeholder-gray-400 focus:outline-none resize-none"
+                    minHeight={50}
+                    maxHeight={250}
                     disabled={isGenerating}
-                    maxLength={600}
                 />
 
                 <div className="px-2 py-1.5 grow-0 flex items-center gap-2 text-xs text-gray-400 border-t border-white/10">

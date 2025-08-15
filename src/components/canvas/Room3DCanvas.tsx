@@ -3,14 +3,14 @@
 import React, { useState, useEffect, Suspense, } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, } from '@react-three/drei';
-import Room from '@/components/rooms/room1/Room';
-import RoomControls from '@/components/canvas/RoomControls'
+import Room from '../rooms/room1/Room';
+import RoomControls from './controls/RoomControls'
 import Sidebar from './sidebar/Sidebar';
-import PlayGround from './PlayGround';
-import HtmlLoader from './SuspenseLoader';
-import ObjectControls from './ObjectControls';
-import { MeshProvider, useMeshContext } from './MeshContext';
-import { RoomProvider, useRoomContext } from './RoomDimensionsContext';
+import PlayGround from './components/PlayGround';
+import HtmlLoader from './components/SuspenseLoader';
+import ObjectControls from './controls/ObjectControls';
+import { MeshProvider, useMeshContext } from './context/MeshContext';
+import { RoomProvider, useRoomContext } from './context/RoomDimensionsContext';
 
 function Room3DCanvasContent() {
     const [controlsVisible, setControlsVisible] = useState<boolean>(true);

@@ -1,11 +1,11 @@
-import { useFrame, useThree } from "@react-three/fiber"
-import { PlacedObject } from "./types"
+import { useThree } from "@react-three/fiber"
+import { PlacedObject } from "../types"
 import { Suspense, useEffect, useRef } from "react"
 import * as THREE from 'three'
 import DraggableObject from "./DraggableObject"
 import React from "react"
 import HtmlLoader from "./SuspenseLoader"
-import { useMeshContext } from "./MeshContext"
+import { useMeshContext } from "../context/MeshContext"
 
 
 interface PlayGroundProps {

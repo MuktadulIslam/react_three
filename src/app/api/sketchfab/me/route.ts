@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios, { AxiosError } from 'axios';
-import { downloadAPIConfig } from '@/components/canvas/sketchfab/config';
+import { downloadAPIConfig } from '@/components/canvas/sketchfab/config/apiConfig';
 import { getAccessTokenFromRequest } from '@/components/canvas/sketchfab/utils/authToken';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {

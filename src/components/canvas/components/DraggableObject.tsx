@@ -2,7 +2,7 @@ import { DragControls } from "@react-three/drei"
 import React from "react"
 import { useEffect, useRef, useState } from "react"
 import * as THREE from 'three'
-import { useMeshContext } from "./MeshContext"
+import { useMeshContext } from "../context/MeshContext"
 
 interface DraggableObjectProps {
   objectId: string,

@@ -1,4 +1,3 @@
-// src/components/canvas/sidebar/SidebarHeader.tsx (Complete)
 import { Dispatch, SetStateAction, useRef } from "react";
 
 interface SidebarHeaderProps {
