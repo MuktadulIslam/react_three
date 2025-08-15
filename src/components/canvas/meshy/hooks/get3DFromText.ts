@@ -20,7 +20,7 @@ export const useGet3DFromText = () => {
             return responseData;
         },
         onError: (error) => {
-            console.log('Error updating the simulation!', error);
+            console.error('Error updating the simulation!', error);
         }
     });
 };

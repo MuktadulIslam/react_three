@@ -52,10 +52,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     try {
         const formData = new URLSearchParams();
+        const url = new URL(request.url)
         formData.append('grant_type', 'authorization_code');
         formData.append('client_id', config.clientId);
         formData.append('client_secret', config.clientSecret);
-        formData.append('redirect_uri', config.redirectUri);
+        formData.append('redirect_uri', config.redirectUri(url.origin));
         formData.append('code', code);
 
         const tokenResponse = await axios({
