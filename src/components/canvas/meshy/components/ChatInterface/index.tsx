@@ -28,7 +28,9 @@ export default function ChatInterface({ onAddModelToSidebar }: ChatInterfaceProp
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (messages.length > 1) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
     }, [messages]);
 
     // Initialize session when component mounts or tab changes
@@ -92,7 +94,9 @@ export default function ChatInterface({ onAddModelToSidebar }: ChatInterfaceProp
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-2 space-y-2">
                 {messages.map((message) =>
-                    message.type == 'user' ? (<UserMessage key={message.id} message={message} />) : (
+                    message.type == 'user' ? (
+                        <UserMessage key={message.id} message={message} />
+                    ) : (
                         <AIMessage
                             key={message.id}
                             message={message}

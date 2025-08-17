@@ -33,19 +33,12 @@ export default function InputArea() {
     } = useMeshyChat();
 
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
-
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-
+    
     // Mutation hooks
     const textTo3DMutation = useGet3DFromText();
     const imageTo3DMutation = useGet3DFromImage();
     const refineModelMutation = useRefineModel();
-
-    // Auto-scroll to bottom when new messages arrive
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
 
     const processImageFile = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {

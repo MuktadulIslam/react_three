@@ -22,7 +22,7 @@ export default function SearchBar({ onSearch, currentQuery, isSearching }: Searc
     };
 
     return (
-        <div className="max-w-xl mx-auto mb-12">
+        <div className="max-w-[650px] mx-auto mb-12">
             <div className="relative">
                 <input
                     type="text"
@@ -30,7 +30,7 @@ export default function SearchBar({ onSearch, currentQuery, isSearching }: Searc
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Search for free downloadable 3D models..."
-                    className="w-full px-6 py-2 text-base font-semibold bg-white/50 backdrop-blur-md border border-gray-800 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                    className="w-full px-6 py-2 text-base font-semibold bg-white/50 backdrop-blur-md border border-gray-800 rounded-2xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
                     disabled={isSearching}
                 />
                 {isSearching && (

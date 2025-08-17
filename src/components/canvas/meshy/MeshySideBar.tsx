@@ -18,7 +18,7 @@ interface MeshySideBarProps {
 
 function MeshySideBarContent({ show, setShow, onAddModelToSidebar }: MeshySideBarProps) {
     return (
-        <div className={`h-screen w-3xl ${show ? '' : '-translate-x-full'} transition-all duration-300 absolute left-0 top-0 bottom-0 z-50 backdrop-blur-sm`}>
+        <div className={`h-full w-[800px] ${show ? '' : '-translate-x-full'} transition-all duration-300 absolute left-0 top-0 bottom-0 z-50 backdrop-blur-sm`}>
             <div className="w-full h-full flex flex-col overflow-hidden">
                 <MeshyHeader setShow={setShow} />
 

@@ -1,4 +1,4 @@
-import { ArtStyleOption, GenerationTypeOption, ModelOption, SymmetryOption } from "@/components/canvas/meshy/types";
+import { ArtStyleOption, GenerationTypeOption, ModelOption, SymmetryOption } from "../../../../types";
 
 export const artStyleOptions: ArtStyleOption[] = [
     { value: 'realistic', label: 'Realistic', description: 'Photorealistic 3D models', icon: '📷' },
